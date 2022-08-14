@@ -28,20 +28,21 @@ function gameInit()
     // get level data from the tiles image
     const imageLevelDataRow = 1;
     mainContext.drawImage(tileImage, 0, 0);
-    for (pos.x = tileCollisionSize.x; pos.x--;)
-    for (pos.y = tileCollisionSize.y; pos.y--;)
-    {
-        const data = mainContext.getImageData(pos.x, 16*(imageLevelDataRow+1)-pos.y-1, 1, 1).data;
-        if (data[0])
+    for (pos.x = tileCollisionSize.x; pos.x--;) {
+        for (pos.y = tileCollisionSize.y; pos.y--;)
         {
-            setTileCollisionData(pos, 1);
+            const data = mainContext.getImageData(pos.x, 16*(imageLevelDataRow+1)-pos.y-1, 1, 1).data;
+            if (data[0])
+            {
+                setTileCollisionData(pos, 1);
 
-            const tileIndex = 1;
-            const direction = randInt(4)
-            const mirror = randInt(2);
-            const color = randColor();
-            const data = new TileLayerData(tileIndex, direction, mirror, color);
-            tileLayer.setData(pos, data);
+                const tileIndex = 1;
+                const direction = randInt(4)
+                const mirror = randInt(2);
+                const color = randColor();
+                const data = new TileLayerData(tileIndex, direction, mirror, color);
+                tileLayer.setData(pos, data);
+            }
         }
     }
     tileLayer.redraw();
@@ -87,8 +88,9 @@ function gameUpdate()
     }
 
     // move particles to mouse location if on screen
-    if (mousePosScreen.x)
+    if (mousePosScreen.x) {
         particleEmiter.pos = mousePos;
+    }
 }
 
 ///////////////////////////////////////////////////////////////////////////////
