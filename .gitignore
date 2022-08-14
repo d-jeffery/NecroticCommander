@@ -1,2 +1,4 @@
 .idea
 examples
+build
+node_modules
