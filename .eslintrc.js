@@ -10,6 +10,6 @@ module.exports = {
     ecmaVersion: 'latest',
   },
   rules: {
-    "brace-style": "1tbs"
+    'brace-style': 'error'
   },
 };

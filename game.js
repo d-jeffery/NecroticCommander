@@ -2,57 +2,52 @@
     LittleJS Hello World Starter Game
 */
 
-'use strict';
-
 // popup errors if there are any (help diagnose issues on mobile devices)
-//onerror = (...parameters)=> alert(parameters);
+// onerror = (...parameters)=> alert(parameters);
 
 // game variables
 let particleEmiter;
 
 // sound effects
-const sound_click = new Sound([.5,.5]);
+const sound_click = new Sound([0.5, 0.5]);
 
 // medals
 const medal_example = new Medal(0, 'Example Medal', 'Medal description goes here.');
 medalsInit('Hello World');
 
-///////////////////////////////////////////////////////////////////////////////
-function gameInit()
-{
-    // create tile collision and visible tile layer
-    initTileCollision(vec2(32, 16));
-    const tileLayer = new TileLayer(vec2(), tileCollisionSize);
-    const pos = vec2();
+/// ////////////////////////////////////////////////////////////////////////////
+function gameInit() {
+  // create tile collision and visible tile layer
+  initTileCollision(vec2(32, 16));
+  const tileLayer = new TileLayer(vec2(), tileCollisionSize);
+  const pos = vec2();
 
-    // get level data from the tiles image
-    const imageLevelDataRow = 1;
-    mainContext.drawImage(tileImage, 0, 0);
-    for (pos.x = tileCollisionSize.x; pos.x--;) {
-        for (pos.y = tileCollisionSize.y; pos.y--;)
-        {
-            const data = mainContext.getImageData(pos.x, 16*(imageLevelDataRow+1)-pos.y-1, 1, 1).data;
-            if (data[0])
-            {
-                setTileCollisionData(pos, 1);
+  // get level data from the tiles image
+  const imageLevelDataRow = 1;
+  mainContext.drawImage(tileImage, 0, 0);
+  for (pos.x = tileCollisionSize.x; pos.x--;) {
+    for (pos.y = tileCollisionSize.y; pos.y--;) {
+      const { data } = mainContext.getImageData(pos.x, 16 * (imageLevelDataRow + 1) - pos.y - 1, 1, 1);
+      if (data[0]) {
+        setTileCollisionData(pos, 1);
 
-                const tileIndex = 1;
-                const direction = randInt(4)
-                const mirror = randInt(2);
-                const color = randColor();
-                const data = new TileLayerData(tileIndex, direction, mirror, color);
-                tileLayer.setData(pos, data);
-            }
-        }
+        const tileIndex = 1;
+        const direction = randInt(4);
+        const mirror = randInt(2);
+        const color = randColor();
+        const data = new TileLayerData(tileIndex, direction, mirror, color);
+        tileLayer.setData(pos, data);
+      }
     }
-    tileLayer.redraw();
+  }
+  tileLayer.redraw();
 
-    // move camera to center of collision
-    cameraPos = tileCollisionSize.scale(.5);
-    cameraScale = 32;
+  // move camera to center of collision
+  cameraPos = tileCollisionSize.scale(0.5);
+  cameraScale = 32;
 
-    // enable gravity
-    gravity = -.01;
+  // enable gravity
+  gravity = -0.01;
 
     // create particle emitter
     const center = tileCollisionSize.scale(.5).add(vec2(0,9));
@@ -69,50 +64,45 @@ function gameInit()
     particleEmiter.trailScale = 2;  // stretch in direction of motion
 }
 
-///////////////////////////////////////////////////////////////////////////////
-function gameUpdate()
-{
-    if (mouseWasPressed(0))
-    {
-        // play sound when mouse is pressed
-        sound_click.play(mousePos);
+/// ////////////////////////////////////////////////////////////////////////////
+function gameUpdate() {
+  if (mouseWasPressed(0)) {
+    // play sound when mouse is pressed
+    sound_click.play(mousePos);
 
-        // change particle color and set to fade out
-        particleEmiter.colorStartA = new Color;
-        particleEmiter.colorStartB = randColor();
-        particleEmiter.colorEndA = particleEmiter.colorStartA.scale(1,0);
-        particleEmiter.colorEndB = particleEmiter.colorStartB.scale(1,0);
+    // change particle color and set to fade out
+    particleEmiter.colorStartA = new Color();
+    particleEmiter.colorStartB = randColor();
+    particleEmiter.colorEndA = particleEmiter.colorStartA.scale(1, 0);
+    particleEmiter.colorEndB = particleEmiter.colorStartB.scale(1, 0);
 
-        // unlock medals
-        medal_example.unlock();
-    }
+    // unlock medals
+    medal_example.unlock();
+  }
 
-    // move particles to mouse location if on screen
-    if (mousePosScreen.x) {
-        particleEmiter.pos = mousePos;
-    }
+  // move particles to mouse location if on screen
+  if (mousePosScreen.x) {
+    particleEmiter.pos = mousePos;
+  }
 }
 
-///////////////////////////////////////////////////////////////////////////////
-function gameUpdatePost()
-{
+/// ////////////////////////////////////////////////////////////////////////////
+function gameUpdatePost() {
 
 }
 
-///////////////////////////////////////////////////////////////////////////////
-function gameRender()
-{
-    // draw a grey square in the background without using webgl
-    drawRect(cameraPos, tileCollisionSize.add(vec2(5)), new Color(.2,.2,.2), 0, 0);
+/// ////////////////////////////////////////////////////////////////////////////
+function gameRender() {
+  // draw a grey square in the background without using webgl
+  drawRect(cameraPos, tileCollisionSize.add(vec2(5)), new Color(0.2, 0.2, 0.2), 0, 0);
 }
 
-///////////////////////////////////////////////////////////////////////////////
-function gameRenderPost()
-{
-    // draw to overlay canvas for hud rendering
-    drawTextScreen('Hello World', vec2(overlayCanvas.width/2, 80), 80, new Color, 9);
+/// ////////////////////////////////////////////////////////////////////////////
+function gameRenderPost() {
+  // draw to overlay canvas for hud rendering
+  drawTextScreen('Hello World', vec2(overlayCanvas.width / 2, 80), 80, new Color(), 9);
 }
 
-///////////////////////////////////////////////////////////////////////////////
+/// ////////////////////////////////////////////////////////////////////////////
 // Startup LittleJS Engine
 engineInit(gameInit, gameUpdate, gameUpdatePost, gameRender, gameRenderPost, 'tiles.png');
