@@ -2,18 +2,15 @@
 class Necromancer extends EngineObject {
     constructor(pos) {
         super(pos, vec2(4), 0);
-
-        this.setCollision(0, 0);
     }
 }
 
 // Cursor
 class Cursor extends EngineObject {
     constructor(pos) {
-        super(pos, vec2(4), 1, tileSizeDefault, 0);
+        super(pos, vec2(3), 1, vec2(16), 0);
+        this.setCollision(1,1);
 
-        // set to collide
-        this.setCollision(0, 0);
         this.addChild(new ParticleEmitter(
             vec2(0, 0), 0, objectDefaultSize, 0, 4, 0,  // pos, angle, emitSize, emitTime, emitRate, emiteCone
             0, tileSizeDefault,                              // tileIndex, tileSize
@@ -45,16 +42,32 @@ class Cursor extends EngineObject {
 // Buttons
 class Button extends EngineObject {
     constructor(pos, text, color) {
-        super(pos, vec2(0, 0), 0);
+        super(pos, vec2( 15, 4));
         this.text = text;
         this.color = color;
         this.font = new FontImage();
+        this.setCollision(1);
     }
 
     render() {
-        drawRect(vec2(this.pos.x, this.pos.y - 1.5), vec2( 15, 4), this.color)
+        drawRect(vec2(this.pos.x, this.pos.y), vec2( 15, 4), this.color);
         this.font.drawText(this.text, this.pos, 0.2, true);
     }
+
+    collideWithObject(o) {
+        if (o === cursor && mouseIsDown(0)) {
+
+            engineObjects.forEach( (obj) => {
+                if (obj instanceof Button) {
+                    obj.color = new Color(1, 0, 0);
+                }
+            })
+
+            this.color = new Color(0, 1, 0);
+        }
+        return false;
+    }
+
 }
 
 class SkeletonButton extends Button {
