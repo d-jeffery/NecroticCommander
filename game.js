@@ -9,7 +9,6 @@
 
 let levelSize, cursor, necromancer;
 let skeletonButton, explosionButton;
-let statusBar;
 
 ///////////////////////////////////////////////////////////////////////////////
 function gameInit() {
@@ -18,7 +17,6 @@ function gameInit() {
     cameraPos = levelSize.scale(.5);
     necromancer = new Necromancer(vec2(levelSize.x / 2, 20));
     cursor = new Cursor(vec2(levelSize.x / 2, levelSize.y / 2))
-    statusBar = new StatusBars(vec2(12, 7))
     explosionButton = new ExplosionButton(vec2(levelSize.x - 8, 3))
     skeletonButton = new SkeletonButton(vec2(levelSize.x - 8, 9))
 }
@@ -35,13 +33,21 @@ function gameUpdatePost() {
 
 /// ////////////////////////////////////////////////////////////////////////////
 function gameRender() {
-    drawRect(cameraPos, levelSize.scale(2), new Color(.4, .4, .4));
-    drawRect(cameraPos, levelSize, new Color(.1, .1, .1));
+
 }
 
 /// ////////////////////////////////////////////////////////////////////////////
 function gameRenderPost() {
+    drawRect(cameraPos, levelSize.scale(2), new Color(.4, .4, .4), 0, false);
+    drawRect(cameraPos, levelSize, new Color(0, .1, .1), 0, false);
 
+    const font = new FontImage();
+
+    font.drawText("Health", vec2(1, 5).scale(2), 0.2);
+    drawLine(vec2(1, 3.5).scale(2), vec2(necromancer.health + 1, 3.5).scale(2), 1, new Color(1, 0, 0));
+
+    font.drawText("Mana", vec2(1, 2.5).scale(2), 0.2);
+    drawLine(vec2(1, 1).scale(2), vec2(necromancer.mana + 1, 1).scale(2), 1, new Color(0, 0, 1));
 }
 
 /// ////////////////////////////////////////////////////////////////////////////

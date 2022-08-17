@@ -2,6 +2,8 @@
 class Necromancer extends EngineObject {
     constructor(pos) {
         super(pos, vec2(4), 0);
+        this.health = 10;
+        this.mana = 10;
     }
 }
 
@@ -36,24 +38,6 @@ class Cursor extends EngineObject {
         }
         this.pos.x = clamp(this.pos.x, this.size.x / 2, levelSize.x - this.size.x / 2);
         this.pos.y = clamp(this.pos.y, this.size.y / 2, levelSize.y - this.size.y / 2);
-    }
-}
-
-// Health & Mana Bars
-class StatusBars extends EngineObject {
-    constructor(pos) {
-        super(pos);
-        this.health = 10;
-        this.mana = 10;
-        this.font = new FontImage();
-    }
-
-    render() {
-        this.font.drawText("Health", vec2(2, this.pos.y + 4), 0.2);
-        drawRect(vec2(this.pos.x, this.pos.y + 1), vec2(this.pos.x + this.health, 1), new Color(1, 0, 0));
-
-        this.font.drawText("Mana", vec2(2, this.pos.y - 2), 0.2);
-        drawRect(vec2(this.pos.x, this.pos.y - 5), vec2(this.pos.x + this.mana, 1), new Color(0, 0, 1));
     }
 }
 
