@@ -39,19 +39,39 @@ class Cursor extends EngineObject {
     }
 }
 
+// Health & Mana Bars
+class StatusBars extends EngineObject {
+    constructor(pos) {
+        super(pos);
+        this.health = 10;
+        this.mana = 10;
+        this.font = new FontImage();
+    }
+
+    render() {
+        this.font.drawText("Health", vec2(2, this.pos.y + 3), 0.2);
+        drawRect(vec2(this.pos.x, this.pos.y), vec2(this.pos.x + this.health, 1), new Color(1, 0, 0));
+
+        this.font.drawText("Mana", vec2(2, this.pos.y - 2), 0.2);
+        drawRect(vec2(this.pos.x, this.pos.y - 5), vec2(this.pos.x + this.mana, 1), new Color(0, 0, 1));
+    }
+}
+
 // Buttons
 class Button extends EngineObject {
-    constructor(pos, text, color) {
+    constructor(pos, text, color, backgroundColor) {
         super(pos, vec2( 15, 4));
         this.text = text;
         this.color = color;
+        this.backgroundColor = backgroundColor;
         this.font = new FontImage();
         this.setCollision(1);
     }
 
     render() {
-        drawRect(vec2(this.pos.x, this.pos.y), vec2( 15, 4), this.color);
-        this.font.drawText(this.text, this.pos, 0.2, true);
+        drawRect(vec2(this.pos.x, this.pos.y), vec2( 15, 5), this.backgroundColor);
+        drawRect(vec2(this.pos.x, this.pos.y), vec2( 14, 4), this.color);
+        this.font.drawText(this.text, vec2(this.pos.x, this.pos.y + 1.5), 0.2, true);
     }
 
     collideWithObject(o) {
@@ -60,24 +80,25 @@ class Button extends EngineObject {
             engineObjects.forEach( (obj) => {
                 if (obj instanceof Button) {
                     obj.color = new Color(1, 0, 0);
+                    obj.backgroundColor = new Color(0.5, 0, 0);
                 }
             })
 
-            this.color = new Color(0, 1, 0);
+            this.color = new Color(1, 0, 1);
+            this.backgroundColor = new Color(0.5, 0, 0.5)
         }
         return false;
     }
-
 }
 
 class SkeletonButton extends Button {
     constructor(pos) {
-        super(pos, "Summon\nSkeleton", new Color(1, 0, 0));
+        super(pos, "Summon\nSkeleton", new Color(1, 0, 0), new Color(0.5, 0, 0));
     }
 }
 
 class ExplosionButton extends Button {
     constructor(pos) {
-        super(pos, "Corpse\nExplosion", new Color(1, 0, 0));
+        super(pos, "Corpse\nExplosion", new Color(1, 0, 0), new Color(0.5, 0, 0));
     }
 }
