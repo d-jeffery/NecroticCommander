@@ -7,23 +7,30 @@
 // popup errors if there are any (help diagnose issues on mobile devices)
 // onerror = (...parameters)=> alert(parameters);
 
-let levelSize, cursor, necromancer;
+let levelSize, cursor, necromancer, hudHeight;
 let skeletonButton, explosionButton;
+let units;
 
 ///////////////////////////////////////////////////////////////////////////////
 function gameInit() {
     canvasFixedSize = vec2(720, 1280); // 720p
     levelSize = vec2(40, 72);
+    hudHeight = 15;
     cameraPos = levelSize.scale(.5);
     necromancer = new Necromancer(vec2(levelSize.x / 2, 20));
     cursor = new Cursor(vec2(levelSize.x / 2, levelSize.y / 2))
     explosionButton = new ExplosionButton(vec2(levelSize.x - 8, 3))
     skeletonButton = new SkeletonButton(vec2(levelSize.x - 8, 9))
+    units = [];
 }
 
 /// ////////////////////////////////////////////////////////////////////////////
 function gameUpdate() {
-
+    if (skeletonButton.selected && cursor.pos.y > hudHeight) {
+        if (mouseIsDown(0) || gamepadIsDown(0)) {
+            units.push(new Skeleton(cursor.pos))
+        }
+    }
 }
 
 /// ////////////////////////////////////////////////////////////////////////////

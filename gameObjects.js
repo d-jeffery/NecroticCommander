@@ -6,15 +6,29 @@ class Necromancer extends EngineObject {
         this.mana = 10;
     }
 
-    update() {
-        if (isUsingGamepad) {
-            this.pos.x += gamepadStick(1).x;
-        } else if (keyIsDown(37)) {
-            this.pos.x -= 0.2;
-        } else if (keyIsDown(39)) {
-            this.pos.x += 0.2;
-        }
-        this.pos.x = clamp(this.pos.x, this.size.x/2, levelSize.x - this.size.x/2);
+    // Enable for movement.
+    // update() {
+    //     if (isUsingGamepad) {
+    //         this.pos.x += gamepadStick(1).x;
+    //     } else if (keyIsDown(37)) {
+    //         this.pos.x -= 0.2;
+    //     } else if (keyIsDown(39)) {
+    //         this.pos.x += 0.2;
+    //     }
+    //     this.pos.x = clamp(this.pos.x, this.size.x/2, levelSize.x - this.size.x/2);
+    // }
+}
+
+// Summons
+class Unit extends EngineObject {
+    constructor(pos, tileIndex) {
+        super(pos, vec2(3), tileIndex)
+    }
+}
+
+class Skeleton extends Unit {
+    constructor(pos) {
+        super(pos, 2);
     }
 }
 
@@ -79,7 +93,7 @@ class Button extends EngineObject {
     }
 
     collideWithObject(o) {
-        if (o === cursor && mouseIsDown(0)) {
+        if ((o === cursor && mouseIsDown(0)) || (o === cursor && gamepadIsDown(0))) {
             engineObjects.forEach( (obj) => {
                 if (obj instanceof Button) {
                     obj.selected = false;
