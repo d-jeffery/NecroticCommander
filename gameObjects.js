@@ -49,8 +49,8 @@ class StatusBars extends EngineObject {
     }
 
     render() {
-        this.font.drawText("Health", vec2(2, this.pos.y + 3), 0.2);
-        drawRect(vec2(this.pos.x, this.pos.y), vec2(this.pos.x + this.health, 1), new Color(1, 0, 0));
+        this.font.drawText("Health", vec2(2, this.pos.y + 4), 0.2);
+        drawRect(vec2(this.pos.x, this.pos.y + 1), vec2(this.pos.x + this.health, 1), new Color(1, 0, 0));
 
         this.font.drawText("Mana", vec2(2, this.pos.y - 2), 0.2);
         drawRect(vec2(this.pos.x, this.pos.y - 5), vec2(this.pos.x + this.mana, 1), new Color(0, 0, 1));
@@ -64,11 +64,20 @@ class Button extends EngineObject {
         this.text = text;
         this.color = color;
         this.backgroundColor = backgroundColor;
+        this.selected = false;
         this.font = new FontImage();
         this.setCollision(1);
     }
 
     render() {
+        if (this.selected) {
+            this.color = new Color(1, 0, 1);
+            this.backgroundColor = new Color(0.5, 0, 0.5)
+        } else {
+            this.color = new Color(1, 0, 0);
+            this.backgroundColor = new Color(0.5, 0, 0);
+        }
+
         drawRect(vec2(this.pos.x, this.pos.y), vec2( 15, 5), this.backgroundColor);
         drawRect(vec2(this.pos.x, this.pos.y), vec2( 14, 4), this.color);
         this.font.drawText(this.text, vec2(this.pos.x, this.pos.y + 1.5), 0.2, true);
@@ -76,16 +85,12 @@ class Button extends EngineObject {
 
     collideWithObject(o) {
         if (o === cursor && mouseIsDown(0)) {
-
             engineObjects.forEach( (obj) => {
                 if (obj instanceof Button) {
-                    obj.color = new Color(1, 0, 0);
-                    obj.backgroundColor = new Color(0.5, 0, 0);
+                    obj.selected = false;
                 }
             })
-
-            this.color = new Color(1, 0, 1);
-            this.backgroundColor = new Color(0.5, 0, 0.5)
+            this.selected = true;
         }
         return false;
     }
