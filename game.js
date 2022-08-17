@@ -9,7 +9,7 @@
 
 let levelSize, cursor, necromancer, hudHeight;
 let skeletonButton, explosionButton;
-let units;
+let units, graves;
 
 ///////////////////////////////////////////////////////////////////////////////
 function gameInit() {
@@ -22,6 +22,13 @@ function gameInit() {
     explosionButton = new ExplosionButton(vec2(levelSize.x - 8, 3))
     skeletonButton = new SkeletonButton(vec2(levelSize.x - 8, 9))
     units = [];
+
+    graves = [];
+    for(let i = -15; i < 17; i += 6) {
+        for(let j = -15; j < 17; j += 6) {
+            graves.push(new Grave(vec2(cameraPos.x + i, cameraPos.y + j + 8)))
+        }
+    }
 }
 
 /// ////////////////////////////////////////////////////////////////////////////

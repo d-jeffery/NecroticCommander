@@ -20,6 +20,35 @@ class Necromancer extends EngineObject {
 }
 
 // Summons
+class Grave extends EngineObject {
+    constructor(pos) {
+        super(pos, vec2(3), 3);
+        this.setCollision(1);
+    }
+
+    collideWithObject(o) {
+        if ((o === cursor && mouseIsDown(0)) || (o === cursor && gamepadIsDown(0))) {
+            units.push(new Skeleton(this.pos));
+
+            // Particle explosion
+            const color1 = new Color(0.70, 0.44, 0.44);
+            const color2 = color1.lerp(new Color, .5);
+            new ParticleEmitter(
+                this.pos, 0, this.size, .1, 200, PI,  // pos, angle, emitSize, emitTime, emitRate, emiteCone
+                0, vec2(16),                          // tileIndex, tileSize
+                color1, color2,                       // colorStartA, colorStartB
+                color1.scale(1,0), color2.scale(1,0), // colorEndA, colorEndB
+                .2, 1, 1, .1, .05,    // particleTime, sizeStart, sizeEnd, particleSpeed, particleAngleSpeed
+                .99, .95, .4, PI, .1, // damping, angleDamping, gravityScale, particleCone, fadeRate,
+                1, 0, 1               // randomness, collide, additive, randomColorLinear, renderOrder
+            );
+
+            this.destroy();
+        }
+        return false;
+    }
+}
+
 class Unit extends EngineObject {
     constructor(pos, tileIndex) {
         super(pos, vec2(3), tileIndex)
