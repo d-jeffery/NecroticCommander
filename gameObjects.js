@@ -5,6 +5,17 @@ class Necromancer extends EngineObject {
         this.health = 10;
         this.mana = 10;
     }
+
+    update() {
+        if (isUsingGamepad) {
+            this.pos.x += gamepadStick(1).x;
+        } else if (keyIsDown(37)) {
+            this.pos.x -= 0.2;
+        } else if (keyIsDown(39)) {
+            this.pos.x += 0.2;
+        }
+        this.pos.x = clamp(this.pos.x, this.size.x/2, levelSize.x - this.size.x/2);
+    }
 }
 
 // Cursor

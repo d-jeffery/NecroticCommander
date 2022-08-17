@@ -41,6 +41,8 @@ function gameRenderPost() {
     drawRect(cameraPos, levelSize.scale(2), new Color(.4, .4, .4), 0, false);
     drawRect(cameraPos, levelSize, new Color(0, .1, .1), 0, false);
 
+    drawLine(vec2(0, 13), vec2(40, 13), 2, new Color(.4, .4, .4));
+
     const font = new FontImage();
 
     font.drawText("Health", vec2(1, 5).scale(2), 0.2);
