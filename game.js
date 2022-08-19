@@ -33,11 +33,11 @@ function gameInit() {
 
 /// ////////////////////////////////////////////////////////////////////////////
 function gameUpdate() {
-    if (skeletonButton.selected && cursor.pos.y > hudHeight) {
-        if (mouseIsDown(0) || gamepadIsDown(0)) {
-            units.push(new Skeleton(cursor.pos))
-        }
-    }
+    // if (skeletonButton.selected && cursor.pos.y > hudHeight) {
+    //     if (mouseIsDown(0) || gamepadIsDown(0)) {
+    //         units.push(new Skeleton(cursor.pos))
+    //     }
+    // }
 }
 
 /// ////////////////////////////////////////////////////////////////////////////

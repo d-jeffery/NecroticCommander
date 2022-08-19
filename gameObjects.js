@@ -27,23 +27,26 @@ class Grave extends EngineObject {
     }
 
     collideWithObject(o) {
-        if ((o === cursor && mouseIsDown(0)) || (o === cursor && gamepadIsDown(0))) {
-            units.push(new Skeleton(this.pos));
+        if (skeletonButton.selected) {
+            if ((o === cursor && mouseIsDown(0)) ||
+                (o === cursor && gamepadIsDown(0))) {
+                units.push(new Skeleton(this.pos));
 
-            // Particle explosion
-            const color1 = new Color(0.70, 0.44, 0.44);
-            const color2 = color1.lerp(new Color, .5);
-            new ParticleEmitter(
-                this.pos, 0, this.size, .1, 200, PI,  // pos, angle, emitSize, emitTime, emitRate, emiteCone
-                0, vec2(16),                          // tileIndex, tileSize
-                color1, color2,                       // colorStartA, colorStartB
-                color1.scale(1,0), color2.scale(1,0), // colorEndA, colorEndB
-                .2, 1, 1, .1, .05,    // particleTime, sizeStart, sizeEnd, particleSpeed, particleAngleSpeed
-                .99, .95, .4, PI, .1, // damping, angleDamping, gravityScale, particleCone, fadeRate,
-                1, 0, 1               // randomness, collide, additive, randomColorLinear, renderOrder
-            );
+                // Particle explosion
+                const color1 = new Color(0.70, 0.44, 0.44);
+                const color2 = color1.lerp(new Color, .5);
+                new ParticleEmitter(
+                    this.pos, 0, this.size, .1, 200, PI,  // pos, angle, emitSize, emitTime, emitRate, emiteCone
+                    0, vec2(16),                          // tileIndex, tileSize
+                    color1, color2,                       // colorStartA, colorStartB
+                    color1.scale(1,0), color2.scale(1,0), // colorEndA, colorEndB
+                    .2, 1, 1, .1, .05,    // particleTime, sizeStart, sizeEnd, particleSpeed, particleAngleSpeed
+                    .99, .95, .4, PI, .1, // damping, angleDamping, gravityScale, particleCone, fadeRate,
+                    1, 0, 1               // randomness, collide, additive, randomColorLinear, renderOrder
+                );
 
-            this.destroy();
+                this.destroy();
+            }
         }
         return false;
     }
@@ -58,6 +61,23 @@ class Unit extends EngineObject {
 class Skeleton extends Unit {
     constructor(pos) {
         super(pos, 2);
+        this.target = undefined;
+    }
+
+    update() {
+        if (this.target === undefined) {
+            const t = randInCircle(1);
+            this.target = vec2(this.pos.x + t.x, this.pos.y + t.y);
+        }
+
+        this.pos.x = lerp(timeDelta, this.pos.x, this.target.x)
+        this.pos.y = lerp(timeDelta, this.pos.y, this.target.y)
+
+        if (abs(this.pos.x - this.target.x) < 0.1 &&
+            abs(this.pos.y - this.target.y) < 0.1) {
+            this.target = undefined;
+        }
+
     }
 }
 
