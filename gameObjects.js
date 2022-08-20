@@ -107,7 +107,7 @@ class Peasant extends Unit {
         super(pos, Math.round(rand(6, 7)));
     }
 
-    // TODO: Fix Huddle mechanic (fix clamping)
+    // TODO: fix huddle to move towards the mean distance
     // TODO: Flee mechanic
     update() {
         super.update();
@@ -117,17 +117,15 @@ class Peasant extends Unit {
             return;
         }
 
-        let closest = undefined;
+        this.target = undefined;
 
         enemies.forEach((e) => {
             if (e === this) return;
-
-            if (closest === undefined) {
+            if (this.target === undefined) {
                 this.target = e.pos;
-            } else {
-                if (this.pos.distance(e.pos) < this.pos.distance(this.target.pos)) {
-                    this.target = e.pos;
-                }
+            }
+            if (this.pos.distance(e.pos) < this.pos.distance(this.target)) {
+                this.target = e.pos;
             }
         })
 
