@@ -22,7 +22,7 @@ class Necromancer extends EngineObject {
 // Summons
 class Grave extends EngineObject {
     constructor(pos) {
-        super(pos, vec2(3), 3);
+        super(pos, vec2(3), 5);
         this.setCollision(1);
     }
 
@@ -30,7 +30,7 @@ class Grave extends EngineObject {
         if (skeletonButton.selected) {
             if ((o === cursor && mouseIsDown(0)) ||
                 (o === cursor && gamepadIsDown(0))) {
-                units.push(new Skeleton(this.pos));
+                units.push(new Summon(this.pos));
 
                 // Particle explosion
                 const color1 = new Color(0.70, 0.44, 0.44);
@@ -55,20 +55,26 @@ class Grave extends EngineObject {
 class Unit extends EngineObject {
     constructor(pos, tileIndex) {
         super(pos, vec2(3), tileIndex)
+        this.setCollision(1, 1)
     }
 }
 
-class Skeleton extends Unit {
+class Summon extends Unit {
     constructor(pos) {
-        super(pos, 2);
+        super(pos, Math.round(rand(2, 4)));
         this.target = undefined;
     }
 
     update() {
+        super.update()
+
         if (this.target === undefined) {
             const t = randInCircle(1);
             this.target = vec2(this.pos.x + t.x, this.pos.y + t.y);
         }
+
+        this.target.x = clamp(this.target.x, this.size.x / 2, levelSize.x - this.size.x / 2);
+        this.target.y = clamp(this.target.y, this.size.y / 2, levelSize.y - this.size.y / 2);
 
         this.pos.x = lerp(timeDelta, this.pos.x, this.target.x)
         this.pos.y = lerp(timeDelta, this.pos.y, this.target.y)
@@ -77,7 +83,14 @@ class Skeleton extends Unit {
             abs(this.pos.y - this.target.y) < 0.1) {
             this.target = undefined;
         }
+    }
 
+    collideWithObject(o) {
+        if (o instanceof Unit) {
+            this.target = undefined;
+            return true;
+        }
+        return false;
     }
 }
 
@@ -154,9 +167,9 @@ class Button extends EngineObject {
     }
 }
 
-class SkeletonButton extends Button {
+class SummonButton extends Button {
     constructor(pos) {
-        super(pos, "Summon\nSkeleton", new Color(1, 0, 0), new Color(0.5, 0, 0));
+        super(pos, "Summon\nUndead", new Color(1, 0, 0), new Color(0.5, 0, 0));
     }
 }
 

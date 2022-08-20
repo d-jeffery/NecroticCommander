@@ -20,7 +20,7 @@ function gameInit() {
     necromancer = new Necromancer(vec2(levelSize.x / 2, 20));
     cursor = new Cursor(vec2(levelSize.x / 2, levelSize.y / 2))
     explosionButton = new ExplosionButton(vec2(levelSize.x - 8, 3))
-    skeletonButton = new SkeletonButton(vec2(levelSize.x - 8, 9))
+    skeletonButton = new SummonButton(vec2(levelSize.x - 8, 9))
     units = [];
 
     graves = [];
