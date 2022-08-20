@@ -9,7 +9,9 @@
 
 let levelSize, cursor, necromancer, hudHeight;
 let skeletonButton, explosionButton;
-let units, graves;
+let summons, enemies, graves;
+
+let hudY = 13;
 
 ///////////////////////////////////////////////////////////////////////////////
 function gameInit() {
@@ -21,7 +23,14 @@ function gameInit() {
     cursor = new Cursor(vec2(levelSize.x / 2, levelSize.y / 2))
     explosionButton = new ExplosionButton(vec2(levelSize.x - 8, 3))
     skeletonButton = new SummonButton(vec2(levelSize.x - 8, 9))
-    units = [];
+    summons = [];
+
+    enemies = [];
+    for(let i = -15; i < 17; i += 6) {
+        enemies.push(new Peasant(vec2(cameraPos.x + i, cameraPos.y + 32)))
+    }
+    enemies.sort( () => Math.random() - 0.5);
+
 
     graves = [];
     for(let i = -15; i < 17; i += 6) {
@@ -55,7 +64,7 @@ function gameRenderPost() {
     drawRect(cameraPos, levelSize.scale(2), new Color(.4, .4, .4), 0, false);
     drawRect(cameraPos, levelSize, new Color(0, .1, .1), 0, false);
 
-    drawLine(vec2(0, 13), vec2(40, 13), 2, new Color(.4, .4, .4));
+    drawLine(vec2(0, hudY), vec2(40, hudY), 2, new Color(.4, .4, .4));
 
     const font = new FontImage();
 

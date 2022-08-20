@@ -30,7 +30,7 @@ class Grave extends EngineObject {
         if (skeletonButton.selected) {
             if ((o === cursor && mouseIsDown(0)) ||
                 (o === cursor && gamepadIsDown(0))) {
-                units.push(new Summon(this.pos));
+                summons.push(new Summon(this.pos));
 
                 // Particle explosion
                 const color1 = new Color(0.70, 0.44, 0.44);
@@ -56,23 +56,20 @@ class Unit extends EngineObject {
     constructor(pos, tileIndex) {
         super(pos, vec2(3), tileIndex)
         this.setCollision(1, 1)
-    }
-}
-
-class Summon extends Unit {
-    constructor(pos) {
-        super(pos, Math.round(rand(2, 4)));
         this.target = undefined;
     }
 
-    update() {
-        super.update()
-
+    wander() {
         if (this.target === undefined) {
             const t = randInCircle(1);
             this.target = vec2(this.pos.x + t.x, this.pos.y + t.y);
         }
 
+        this.moveTowardsTarget();
+    }
+
+    moveTowardsTarget() {
+        // TODO: clamp make sure hub is not entered
         this.target.x = clamp(this.target.x, this.size.x / 2, levelSize.x - this.size.x / 2);
         this.target.y = clamp(this.target.y, this.size.y / 2, levelSize.y - this.size.y / 2);
 
@@ -84,6 +81,17 @@ class Summon extends Unit {
             this.target = undefined;
         }
     }
+}
+
+class Summon extends Unit {
+    constructor(pos) {
+        super(pos, Math.round(rand(2, 4)));
+    }
+
+    update() {
+        super.update();
+        super.wander();
+    }
 
     collideWithObject(o) {
         if (o instanceof Unit) {
@@ -93,6 +101,47 @@ class Summon extends Unit {
         return false;
     }
 }
+
+class Peasant extends Unit {
+    constructor(pos) {
+        super(pos, Math.round(rand(6, 7)));
+    }
+
+    // TODO: Fix Huddle mechanic (fix clamping)
+    // TODO: Flee mechanic
+    update() {
+        super.update();
+
+        if (this.target) {
+            this.moveTowardsTarget();
+            return;
+        }
+
+        let closest = undefined;
+
+        enemies.forEach((e) => {
+            if (e === this) return;
+
+            if (closest === undefined) {
+                this.target = e.pos;
+            } else {
+                if (this.pos.distance(e.pos) < this.pos.distance(this.target.pos)) {
+                    this.target = e.pos;
+                }
+            }
+        })
+
+    }
+
+    collideWithObject(o) {
+        if (o instanceof Peasant) {
+            this.target = undefined;
+            return true;
+        }
+        return false;
+    }
+}
+
 
 // Cursor
 class Cursor extends EngineObject {
