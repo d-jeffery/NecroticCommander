@@ -57,6 +57,14 @@ class Unit extends EngineObject {
         super(pos, vec2(3), tileIndex)
         this.setCollision(1, 1)
         this.target = undefined;
+        this.health = 100;
+    }
+
+    update() {
+        super.update();
+        if (this.health < 0){
+            this.destroy();
+        }
     }
 
     wander() {
@@ -81,6 +89,10 @@ class Unit extends EngineObject {
             this.target = undefined;
         }
     }
+
+    attack(o, dmg) {
+        o.health -= dmg;
+    }
 }
 
 class Summon extends Unit {
@@ -90,11 +102,30 @@ class Summon extends Unit {
 
     update() {
         super.update();
-        super.wander();
+        if (enemies.length) {
+            let closest = undefined;
+            enemies.forEach((e) => {
+                if (closest === undefined) {
+                    closest = e.pos;
+                }
+                if (this.pos.distance(e.pos) < this.pos.distance(closest)) {
+                    closest = e.pos;
+                }
+            })
+
+            this.target = closest;
+
+            this.moveTowardsTarget();
+        } else {
+            super.wander();
+        }
     }
 
     collideWithObject(o) {
-        if (o instanceof Unit) {
+        if (o instanceof Enemy) {
+            this.attack(o, 1)
+            return true;
+        } else if (o instanceof Unit) {
             this.target = undefined;
             return true;
         }
@@ -102,12 +133,17 @@ class Summon extends Unit {
     }
 }
 
-class Peasant extends Unit {
+class Enemy extends Unit {
+    constructor(pos, tile) {
+        super(pos, tile);
+    }
+}
+
+class Peasant extends Enemy {
     constructor(pos) {
         super(pos, Math.round(rand(6, 7)));
     }
 
-    // TODO: fix huddle to move towards the mean distance
     // TODO: Flee mechanic
     update() {
         super.update();
@@ -126,9 +162,12 @@ class Peasant extends Unit {
     }
 
     collideWithObject(o) {
-        if (o instanceof Peasant) {
+        if (o instanceof Enemy) {
             this.target = undefined;
             // this.velocity = vec2(0, 0);
+            return true;
+        } else if (o instanceof Summon) {
+            this.attack(o, 1)
             return true;
         }
         return false;

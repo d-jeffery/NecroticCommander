@@ -29,8 +29,6 @@ function gameInit() {
     for(let i = -15; i < 17; i += 6) {
         enemies.push(new Peasant(vec2(cameraPos.x + i, cameraPos.y + 32)))
     }
-    enemies.sort( () => Math.random() - 0.5);
-
 
     graves = [];
     for(let i = -15; i < 17; i += 6) {
