@@ -27,7 +27,7 @@ class Grave extends EngineObject {
     }
 
     collideWithObject(o) {
-        if (skeletonButton.selected) {
+        if (summonButton.selected) {
             if ((o === cursor && mouseIsDown(0)) ||
                 (o === cursor && gamepadIsDown(0))) {
                 summons.push(new Summon(this.pos));
@@ -117,23 +117,18 @@ class Peasant extends Unit {
             return;
         }
 
-        this.target = undefined;
+        this.mean = enemies.reduce((t, e) => {
+            return t.add(e.pos);
+        }, vec2(0,0)).scale(1 / enemies.length);
 
-        enemies.forEach((e) => {
-            if (e === this) return;
-            if (this.target === undefined) {
-                this.target = e.pos;
-            }
-            if (this.pos.distance(e.pos) < this.pos.distance(this.target)) {
-                this.target = e.pos;
-            }
-        })
+        this.target = this.mean;
 
     }
 
     collideWithObject(o) {
         if (o instanceof Peasant) {
             this.target = undefined;
+            // this.velocity = vec2(0, 0);
             return true;
         }
         return false;
