@@ -49,7 +49,9 @@ function gameUpdate() {
 
 /// ////////////////////////////////////////////////////////////////////////////
 function gameUpdatePost() {
-
+    graves = graves.filter((g) => !g.destroyed);
+    enemies = enemies.filter((e) => !e.destroyed);
+    summons = summons.filter((s) => !s.destroyed);
 }
 
 /// ////////////////////////////////////////////////////////////////////////////

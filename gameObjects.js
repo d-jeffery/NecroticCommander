@@ -64,6 +64,7 @@ class Unit extends EngineObject {
         super.update();
         if (this.health < 0){
             this.destroy();
+            console.log(this)
         }
     }
 
