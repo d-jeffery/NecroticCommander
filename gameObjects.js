@@ -1,3 +1,37 @@
+function easeInSine(x) {
+    return 1 - Math.cos((x * PI) / 2);
+}
+
+function easeOutBounce(x) {
+    const n1 = 7.5625;
+    const d1 = 2.75;
+
+    if (x < 1 / d1) {
+        return n1 * x * x;
+    } else if (x < 2 / d1) {
+        return n1 * (x -= 1.5 / d1) * x + 0.75;
+    } else if (x < 2.5 / d1) {
+        return n1 * (x -= 2.25 / d1) * x + 0.9375;
+    } else {
+        return n1 * (x -= 2.625 / d1) * x + 0.984375;
+    }
+}
+
+// Particles
+function particleExplode(color1, color2, pos, size) {
+    // Particle explosion
+    return new ParticleEmitter(
+        pos, 0, size, .1, 200, PI,  // pos, angle, emitSize, emitTime, emitRate, emiteCone
+        0, vec2(16),                          // tileIndex, tileSize
+        color1, color2,                       // colorStartA, colorStartB
+        color1.scale(1,0), color2.scale(1,0), // colorEndA, colorEndB
+        .2, 1, 1, .1, .05,    // particleTime, sizeStart, sizeEnd, particleSpeed, particleAngleSpeed
+        .99, .95, .4, PI, .1, // damping, angleDamping, gravityScale, particleCone, fadeRate,
+        1, 0, 1               // randomness, collide, additive, randomColorLinear, renderOrder
+    );
+}
+
+
 // Player
 class Necromancer extends EngineObject {
     constructor(pos) {
@@ -35,15 +69,7 @@ class Grave extends EngineObject {
                 // Particle explosion
                 const color1 = new Color(0.70, 0.44, 0.44);
                 const color2 = color1.lerp(new Color, .5);
-                new ParticleEmitter(
-                    this.pos, 0, this.size, .1, 200, PI,  // pos, angle, emitSize, emitTime, emitRate, emiteCone
-                    0, vec2(16),                          // tileIndex, tileSize
-                    color1, color2,                       // colorStartA, colorStartB
-                    color1.scale(1,0), color2.scale(1,0), // colorEndA, colorEndB
-                    .2, 1, 1, .1, .05,    // particleTime, sizeStart, sizeEnd, particleSpeed, particleAngleSpeed
-                    .99, .95, .4, PI, .1, // damping, angleDamping, gravityScale, particleCone, fadeRate,
-                    1, 0, 1               // randomness, collide, additive, randomColorLinear, renderOrder
-                );
+                particleExplode(color1, color2, this.pos, this.size);
 
                 this.destroy();
             }
@@ -58,13 +84,17 @@ class Unit extends EngineObject {
         this.setCollision(1, 1)
         this.target = undefined;
         this.health = 100;
+        this.moveTime = 0;
+        this.moveSpeed = 0.01;
     }
 
     update() {
         super.update();
         if (this.health < 0){
+            const color1 = new Color(1, 0, 0);
+            const color2 = new Color(0, 0, 0);
+            particleExplode(color1, color2, this.pos, this.size);
             this.destroy();
-            console.log(this)
         }
     }
 
@@ -77,19 +107,30 @@ class Unit extends EngineObject {
         this.moveTowardsTarget();
     }
 
-    moveTowardsTarget() {
+
+    moveTowardsTarget(moveAlg) {
+        if (moveAlg === undefined) {
+            moveAlg = (p) => p
+        }
+
+        // Chasing
         // TODO: clamp make sure hub is not entered
         this.target.x = clamp(this.target.x, this.size.x / 2, levelSize.x - this.size.x / 2);
         this.target.y = clamp(this.target.y, this.size.y / 2, levelSize.y - this.size.y / 2);
 
-        this.pos.x = lerp(timeDelta, this.pos.x, this.target.x)
-        this.pos.y = lerp(timeDelta, this.pos.y, this.target.y)
-
         if (abs(this.pos.x - this.target.x) < 0.1 &&
             abs(this.pos.y - this.target.y) < 0.1) {
             this.target = undefined;
+            this.moveTime = 0;
+            return;
         }
+
+        this.pos.x = lerp(moveAlg(this.moveTime), this.pos.x, this.target.x)
+        this.pos.y = lerp(moveAlg(this.moveTime), this.pos.y, this.target.y)
+
+        this.moveTime += this.moveSpeed * timeDelta;
     }
+
 
     attack(o, dmg) {
         o.health -= dmg;
@@ -116,7 +157,7 @@ class Summon extends Unit {
 
             this.target = closest;
 
-            this.moveTowardsTarget();
+            this.moveTowardsTarget(easeOutBounce);
         } else {
             super.wander();
         }
@@ -149,23 +190,34 @@ class Peasant extends Enemy {
     update() {
         super.update();
 
+        // Attack
+        let closest = undefined;
+        summons.forEach((e) => {
+            if (closest === undefined) {
+                closest = e.pos;
+            }
+            if (this.pos.distance(e.pos) < this.pos.distance(closest)) {
+                closest = e.pos;
+            }
+        })
+
+        this.target = closest;
+
         if (this.target) {
-            this.moveTowardsTarget();
+            this.moveTowardsTarget(smoothStep);
             return;
         }
 
-        this.mean = enemies.reduce((t, e) => {
-            return t.add(e.pos);
-        }, vec2(0,0)).scale(1 / enemies.length);
-
-        this.target = this.mean;
+        // Huddle
+        // this.target = enemies.reduce((t, e) => {
+        //     return t.add(e.pos);
+        // }, vec2(0,0)).scale(1 / enemies.length);
 
     }
 
     collideWithObject(o) {
         if (o instanceof Enemy) {
             this.target = undefined;
-            // this.velocity = vec2(0, 0);
             return true;
         } else if (o instanceof Summon) {
             this.attack(o, 1)
