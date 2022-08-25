@@ -82,18 +82,19 @@ class Unit extends EngineObject {
     constructor(pos, tileIndex) {
         super(pos, vec2(3), tileIndex)
         this.setCollision(1, 1)
+        this.friction = 0.9;
+        this.mass = 10;
         this.target = undefined;
         this.health = 100;
         this.moveTime = 0;
         this.moveSpeed = 0.01;
+        this.renderOrder = 1;
     }
 
     update() {
         super.update();
         if (this.health < 0){
-            const color1 = new Color(1, 0, 0);
-            const color2 = new Color(0, 0, 0);
-            particleExplode(color1, color2, this.pos, this.size);
+            particleExplode(new Color(1, 0, 0), new Color(0, 0, 0), this.pos, this.size);
             this.destroy();
         }
     }
@@ -113,21 +114,38 @@ class Unit extends EngineObject {
             moveAlg = (p) => p
         }
 
-        // Chasing
-        // TODO: clamp make sure hub is not entered
-        this.target.x = clamp(this.target.x, this.size.x / 2, levelSize.x - this.size.x / 2);
-        this.target.y = clamp(this.target.y, this.size.y / 2, levelSize.y - this.size.y / 2);
+        const angle = this.target.subtract(this.pos);
 
-        if (abs(this.pos.x - this.target.x) < 0.1 &&
-            abs(this.pos.y - this.target.y) < 0.1) {
+        this.applyForce(angle.scale(0.01));
+
+        if (abs(this.pos.x - this.target.x) < 0.5 &&
+            abs(this.pos.y - this.target.y) < 0.5) {
             this.target = undefined;
             this.moveTime = 0;
+            this.velocity = vec2(0,0);
             return;
         }
 
-        this.pos.x = lerp(moveAlg(this.moveTime), this.pos.x, this.target.x)
-        this.pos.y = lerp(moveAlg(this.moveTime), this.pos.y, this.target.y)
 
+        // this.pos = this.pos.lerp(this.target, this.moveTime);
+
+        //
+        // // Chasing
+        // // TODO: clamp make sure hub is not entered
+        // this.target.x = clamp(this.target.x, this.size.x / 2, levelSize.x - this.size.x / 2);
+        // this.target.y = clamp(this.target.y, this.size.y / 2, levelSize.y - this.size.y / 2);
+        //
+        // if (abs(this.pos.x - this.target.x) < 1 &&
+        //     abs(this.pos.y - this.target.y) < 1) {
+        //     this.target = undefined;
+        //     this.moveTime = 0;
+        //     console.log("Reset")
+        //     return;
+        // }
+        //
+        // this.pos.x = lerp(moveAlg(this.moveTime), this.pos.x, this.target.x)
+        // this.pos.y = lerp(moveAlg(this.moveTime), this.pos.y, this.target.y)
+        //
         this.moveTime += this.moveSpeed * timeDelta;
     }
 
@@ -206,6 +224,8 @@ class Peasant extends Enemy {
         if (this.target) {
             this.moveTowardsTarget(smoothStep);
             return;
+        } else {
+            this.wander();
         }
 
         // Huddle
