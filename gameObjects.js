@@ -86,8 +86,8 @@ class Unit extends EngineObject {
         this.mass = 10;
         this.target = undefined;
         this.health = 100;
-        this.moveTime = 0;
-        this.moveSpeed = 0.01;
+        // this.moveTime = 0;
+        // this.moveSpeed = 0.01;
         this.renderOrder = 1;
     }
 
@@ -126,6 +126,9 @@ class Unit extends EngineObject {
             return;
         }
 
+        // Clamp to screen size
+        this.pos.x = clamp(this.pos.x, this.size.x / 2, levelSize.x - this.size.x / 2);
+        this.pos.y = clamp(this.pos.y, this.size.y / 2 + 14, levelSize.y - this.size.y / 2);
 
         // this.pos = this.pos.lerp(this.target, this.moveTime);
 
@@ -146,7 +149,7 @@ class Unit extends EngineObject {
         // this.pos.x = lerp(moveAlg(this.moveTime), this.pos.x, this.target.x)
         // this.pos.y = lerp(moveAlg(this.moveTime), this.pos.y, this.target.y)
         //
-        this.moveTime += this.moveSpeed * timeDelta;
+        // this.moveTime += this.moveSpeed * timeDelta;
     }
 
 
