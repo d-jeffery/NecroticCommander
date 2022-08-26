@@ -118,8 +118,8 @@ class Unit extends EngineObject {
 
         this.applyForce(angle.scale(0.01));
 
-        if (abs(this.pos.x - this.target.x) < 0.5 &&
-            abs(this.pos.y - this.target.y) < 0.5) {
+        if (abs(this.pos.x - this.target.x) < 0.1 &&
+            abs(this.pos.y - this.target.y) < 0.1) {
             this.target = undefined;
             this.moveTime = 0;
             this.velocity = vec2(0,0);
@@ -130,25 +130,9 @@ class Unit extends EngineObject {
         this.pos.x = clamp(this.pos.x, this.size.x / 2, levelSize.x - this.size.x / 2);
         this.pos.y = clamp(this.pos.y, this.size.y / 2 + 14, levelSize.y - this.size.y / 2);
 
-        // this.pos = this.pos.lerp(this.target, this.moveTime);
+        this.target.x = clamp(this.target.x, this.size.x / 2, levelSize.x - this.size.x / 2);
+        this.target.y = clamp(this.target.y, this.size.y / 2 + 14, levelSize.y - this.size.y / 2);
 
-        //
-        // // Chasing
-        // // TODO: clamp make sure hub is not entered
-        // this.target.x = clamp(this.target.x, this.size.x / 2, levelSize.x - this.size.x / 2);
-        // this.target.y = clamp(this.target.y, this.size.y / 2, levelSize.y - this.size.y / 2);
-        //
-        // if (abs(this.pos.x - this.target.x) < 1 &&
-        //     abs(this.pos.y - this.target.y) < 1) {
-        //     this.target = undefined;
-        //     this.moveTime = 0;
-        //     console.log("Reset")
-        //     return;
-        // }
-        //
-        // this.pos.x = lerp(moveAlg(this.moveTime), this.pos.x, this.target.x)
-        // this.pos.y = lerp(moveAlg(this.moveTime), this.pos.y, this.target.y)
-        //
         // this.moveTime += this.moveSpeed * timeDelta;
     }
 
