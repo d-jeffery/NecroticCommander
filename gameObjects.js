@@ -84,8 +84,12 @@ class Unit extends EngineObject {
         this.setCollision(1, 1)
         this.friction = 0.9;
         this.mass = 10;
+        this.elasticity = 0.5;
+        this.maxVelocity = 0.1;
+
         this.target = undefined;
         this.health = 100;
+
         // this.moveTime = 0;
         // this.moveSpeed = 0.01;
         this.renderOrder = 1;
@@ -114,17 +118,19 @@ class Unit extends EngineObject {
             moveAlg = (p) => p
         }
 
-        const angle = this.target.subtract(this.pos);
-
-        this.applyForce(angle.scale(0.01));
-
         if (abs(this.pos.x - this.target.x) < 0.1 &&
             abs(this.pos.y - this.target.y) < 0.1) {
             this.target = undefined;
-            this.moveTime = 0;
+            // this.moveTime = 0;
             this.velocity = vec2(0,0);
             return;
+        } else {
+            const angle = this.target.subtract(this.pos);
+            this.applyForce(angle.scale(0.01));
         }
+
+        this.velocity.x = clamp(this.velocity.x, -this.maxVelocity, this.maxVelocity);
+        this.velocity.y = clamp(this.velocity.y, -this.maxVelocity, this.maxVelocity);
 
         // Clamp to screen size
         this.pos.x = clamp(this.pos.x, this.size.x / 2, levelSize.x - this.size.x / 2);
@@ -195,31 +201,32 @@ class Peasant extends Enemy {
     update() {
         super.update();
 
-        // Attack
-        let closest = undefined;
-        summons.forEach((e) => {
-            if (closest === undefined) {
-                closest = e.pos;
-            }
-            if (this.pos.distance(e.pos) < this.pos.distance(closest)) {
-                closest = e.pos;
-            }
-        })
+        // Huddle
+        if (summons.length > enemies.length) {
+            //Huddle
+            this.target = enemies.reduce((t, e) => {
+                return t.add(e.pos);
+            }, vec2(0,0)).scale(1 / enemies.length);
+        } else {
+            // Attack
+            let closest = undefined;
+            summons.forEach((e) => {
+                if (closest === undefined) {
+                    closest = e.pos;
+                }
+                if (this.pos.distance(e.pos) < this.pos.distance(closest)) {
+                    closest = e.pos;
+                }
+            })
 
-        this.target = closest;
+            this.target = closest;
+        }
 
         if (this.target) {
             this.moveTowardsTarget(smoothStep);
-            return;
         } else {
             this.wander();
         }
-
-        // Huddle
-        // this.target = enemies.reduce((t, e) => {
-        //     return t.add(e.pos);
-        // }, vec2(0,0)).scale(1 / enemies.length);
-
     }
 
     collideWithObject(o) {
