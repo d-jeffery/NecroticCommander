@@ -17,7 +17,7 @@
 // onerror = (...parameters)=> alert(parameters);
 
 let levelSize, cursor, necromancer, hudHeight;
-let summonButton, explosionButton, causeFear, blight;
+let summonButton, explosionButton, causeFear, drainSoul;
 let summons, enemies, graves;
 
 let hudY = 13;
@@ -33,8 +33,7 @@ function gameInit() {
     explosionButton = new CorpseBombButton(vec2(levelSize.x - 6, 3))
     summonButton = new RaiseDeadButton(vec2(levelSize.x - 6, 9))
     causeFear = new CauseFearButton(vec2(levelSize.x - 18, 9))
-    blight = new BlightButton(vec2(levelSize.x - 18, 3))
-
+    drainSoul = new DrainSoulButton(vec2(levelSize.x - 18, 3))
 
     summons = [];
 
@@ -77,18 +76,22 @@ function gameRenderPost() {
     drawRect(cameraPos, levelSize.scale(2), new Color(.4, .4, .4), 0, false);
     drawRect(cameraPos, levelSize, new Color(0, .1, .1), 0, false);
 
-    drawRect(vec2(20, 6.5), vec2(40, hudY), 2, new Color(1, 1, 1), false);
-    drawLine(vec2(0, hudY), vec2(40, hudY), 2, new Color(.4, .4, .4));
+    drawLine(vec2(0, 13.5), vec2(40, 13.5), 2, new Color(.4, .4, .4));
+    drawRect(vec2(20, 6), vec2(40, 13.5), 2, new Color(1, 1, 1), false);
 
     const font = new FontImage();
 
     font.drawText("Health", vec2(1, 11), 0.2);
     drawLine(vec2(0.5, 7.5), vec2(10 * 1.5 + 0.5, 7.5), 2, new Color(0.5, 0.5, 0.5));
-    drawLine(vec2(1, 7.5), vec2(necromancer.health * 1.5, 7.5), 1, new Color(1, 0, 0));
+    if (necromancer.health) {
+        drawLine(vec2(1, 7.5), vec2(necromancer.health * 1.5, 7.5), 1, new Color(1, 0, 0));
+    }
 
     font.drawText("Mana", vec2(1, 5.5), 0.2);
     drawLine(vec2(0.5, 2), vec2(10 * 1.5 + 0.5, 2), 2, new Color(0.5, 0.5, 0.5));
-    drawLine(vec2(1, 2), vec2(necromancer.mana * 1.5, 2), 1, new Color(0, 0, 1));
+    if (necromancer.mana) {
+        drawLine(vec2(1, 2), vec2(necromancer.mana * 1.5, 2), 1, new Color(0, 0, 1));
+    }
 }
 
 /// ////////////////////////////////////////////////////////////////////////////

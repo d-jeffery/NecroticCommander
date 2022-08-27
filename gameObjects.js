@@ -35,13 +35,21 @@ function particleExplode(color1, color2, pos, size) {
 // Player
 class Necromancer extends EngineObject {
     constructor(pos) {
-        super(pos, vec2(4), 0);
+        super(pos, vec2(4), 8);
         this.health = 10;
         this.mana = 10;
+        this.generationTime = 0;
     }
 
-    // Enable for movement.
-    // update() {
+    update() {
+        if (this.generationTime > 5 && this.mana < 10) {
+            this.mana++;
+            this.generationTime = 0;
+        }
+        this.generationTime += timeDelta;
+    }
+
+
     //     if (isUsingGamepad) {
     //         this.pos.x += gamepadStick(1).x;
     //     } else if (keyIsDown(37)) {
@@ -61,10 +69,11 @@ class Grave extends EngineObject {
     }
 
     collideWithObject(o) {
-        if (summonButton.selected) {
+        if (summonButton.selected && necromancer.mana > 0) {
             if ((o === cursor && mouseIsDown(0)) ||
                 (o === cursor && gamepadIsDown(0))) {
                 summons.push(new Summon(this.pos));
+                necromancer.mana--;
 
                 // Particle explosion
                 const color1 = new Color(0.70, 0.44, 0.44);
@@ -90,8 +99,6 @@ class Unit extends EngineObject {
         this.target = undefined;
         this.health = 100;
 
-        // this.moveTime = 0;
-        // this.moveSpeed = 0.01;
         this.renderOrder = 1;
     }
 
@@ -138,10 +145,7 @@ class Unit extends EngineObject {
 
         this.target.x = clamp(this.target.x, this.size.x / 2, levelSize.x - this.size.x / 2);
         this.target.y = clamp(this.target.y, this.size.y / 2 + 14, levelSize.y - this.size.y / 2);
-
-        // this.moveTime += this.moveSpeed * timeDelta;
     }
-
 
     attack(o, dmg) {
         o.health -= dmg;
@@ -333,8 +337,8 @@ class CauseFearButton extends Button {
     }
 }
 
-class BlightButton extends Button {
+class DrainSoulButton extends Button {
     constructor(pos) {
-        super(pos, "Cast\nBlight", new Color(1, 0, 0), new Color(0.5, 0, 0));
+        super(pos, "Drain\nSoul", new Color(1, 0, 0), new Color(0.5, 0, 0));
     }
 }
