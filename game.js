@@ -64,33 +64,43 @@ function gameUpdatePost() {
     graves = graves.filter((g) => !g.destroyed);
     enemies = enemies.filter((e) => !e.destroyed);
     summons = summons.filter((s) => !s.destroyed);
+
+    if (necromancer.health <= 0) {
+        necromancer.health = 0;
+        paused = true;
+    }
 }
 
 /// ////////////////////////////////////////////////////////////////////////////
 function gameRender() {
-
-}
-
-/// ////////////////////////////////////////////////////////////////////////////
-function gameRenderPost() {
+    const font = new FontImage();
     drawRect(cameraPos, levelSize.scale(2), new Color(.4, .4, .4), 0, false);
     drawRect(cameraPos, levelSize, new Color(0, .1, .1), 0, false);
 
     drawLine(vec2(0, 13.5), vec2(40, 13.5), 2, new Color(.4, .4, .4));
     drawRect(vec2(20, 6), vec2(40, 13.5), 2, new Color(1, 1, 1), false);
 
-    const font = new FontImage();
 
     font.drawText("Health", vec2(1, 11), 0.2);
     drawLine(vec2(0.5, 7.5), vec2(10 * 1.5 + 0.5, 7.5), 2, new Color(0.5, 0.5, 0.5));
     if (necromancer.health) {
-        drawLine(vec2(1, 7.5), vec2(necromancer.health * 1.5, 7.5), 1, new Color(1, 0, 0));
+        drawLine(vec2(1, 7.5), vec2(necromancer.health * 1.5 / 10, 7.5), 1, new Color(1, 0, 0));
     }
 
     font.drawText("Mana", vec2(1, 5.5), 0.2);
     drawLine(vec2(0.5, 2), vec2(10 * 1.5 + 0.5, 2), 2, new Color(0.5, 0.5, 0.5));
     if (necromancer.mana) {
         drawLine(vec2(1, 2), vec2(necromancer.mana * 1.5, 2), 1, new Color(0, 0, 1));
+    }
+}
+
+/// ////////////////////////////////////////////////////////////////////////////
+function gameRenderPost() {
+    const font = new FontImage();
+    if (necromancer.health === 0) {
+        drawRect(vec2(20, 39), vec2(35, 25), new Color(0, 0, 0), 0, true);
+
+        font.drawText("YOU HAVE\nDIED", vec2(20, 36 + hudY/2), 0.4, true);
     }
 }
 

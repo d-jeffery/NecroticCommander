@@ -36,7 +36,9 @@ function particleExplode(color1, color2, pos, size) {
 class Necromancer extends EngineObject {
     constructor(pos) {
         super(pos, vec2(4), 8);
-        this.health = 10;
+        this.setCollision(1, 1)
+
+        this.health = 100;
         this.mana = 10;
         this.generationTime = 0;
     }
@@ -48,7 +50,6 @@ class Necromancer extends EngineObject {
         }
         this.generationTime += timeDelta;
     }
-
 
     //     if (isUsingGamepad) {
     //         this.pos.x += gamepadStick(1).x;
@@ -211,7 +212,7 @@ class Peasant extends Enemy {
             this.target = enemies.reduce((t, e) => {
                 return t.add(e.pos);
             }, vec2(0,0)).scale(1 / enemies.length);
-        } else {
+        } else if (summons.length > 0) {
             // Attack
             let closest = undefined;
             summons.forEach((e) => {
@@ -224,6 +225,8 @@ class Peasant extends Enemy {
             })
 
             this.target = closest;
+        } else {
+            this.target = necromancer.pos;
         }
 
         if (this.target) {
@@ -237,7 +240,7 @@ class Peasant extends Enemy {
         if (o instanceof Enemy) {
             this.target = undefined;
             return true;
-        } else if (o instanceof Summon) {
+        } else if (o instanceof Summon || o instanceof Necromancer) {
             this.attack(o, 1)
             return true;
         }
