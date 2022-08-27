@@ -297,8 +297,8 @@ class Button extends EngineObject {
             this.backgroundColor = new Color(0.5, 0, 0);
         }
 
-        drawRect(vec2(this.pos.x, this.pos.y), vec2( 15, 5), this.backgroundColor);
-        drawRect(vec2(this.pos.x, this.pos.y), vec2( 14, 4), this.color);
+        drawRect(vec2(this.pos.x, this.pos.y), vec2( 11, 5), this.backgroundColor);
+        drawRect(vec2(this.pos.x, this.pos.y), vec2( 10, 4), this.color);
         this.font.drawText(this.text, vec2(this.pos.x, this.pos.y + 1.5), 0.2, true);
     }
 
@@ -315,14 +315,26 @@ class Button extends EngineObject {
     }
 }
 
-class SummonButton extends Button {
+class RaiseDeadButton extends Button {
     constructor(pos) {
-        super(pos, "Summon\nUndead", new Color(1, 0, 0), new Color(0.5, 0, 0));
+        super(pos, "Raise\nDead", new Color(1, 0, 0), new Color(0.5, 0, 0));
     }
 }
 
-class ExplosionButton extends Button {
+class CorpseBombButton extends Button {
     constructor(pos) {
-        super(pos, "Corpse\nExplosion", new Color(1, 0, 0), new Color(0.5, 0, 0));
+        super(pos, "Corpse\nBomb", new Color(1, 0, 0), new Color(0.5, 0, 0));
+    }
+}
+
+class CauseFearButton extends Button {
+    constructor(pos) {
+        super(pos, "Cause\nFear", new Color(1, 0, 0), new Color(0.5, 0, 0));
+    }
+}
+
+class BlightButton extends Button {
+    constructor(pos) {
+        super(pos, "Cast\nBlight", new Color(1, 0, 0), new Color(0.5, 0, 0));
     }
 }
