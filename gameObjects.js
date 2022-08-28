@@ -37,13 +37,18 @@ class Necromancer extends EngineObject {
     constructor(pos) {
         super(pos, vec2(4), 8);
         this.setCollision(1, 1)
-
+        this.renderOrder = 10
         this.health = 100;
         this.mana = 10;
         this.generationTime = 0;
     }
 
     update() {
+        if (this.health <= 0) {
+            particleExplode(new Color(1, 0, 0), new Color(0, 0, 0), this.pos, this.size);
+            return;
+        }
+
         if (this.generationTime > 5 && this.mana < 10) {
             this.mana++;
             this.generationTime = 0;
