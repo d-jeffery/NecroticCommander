@@ -17,7 +17,7 @@
 // onerror = (...parameters)=> alert(parameters);
 
 let levelSize, cursor, necromancer, hudHeight;
-let summonButton, explosionButton, causeFear, drainSoul;
+let summonButton, explosionButton, spreadDecay, regenManaButton;
 let summons, enemies, graves;
 
 let hudY = 13;
@@ -26,10 +26,10 @@ let hudY = 13;
 function startGame() {
     necromancer = new Necromancer(vec2(levelSize.x / 2, 20));
     cursor = new Cursor(vec2(levelSize.x / 2, levelSize.y / 2))
-    explosionButton = new CorpseBombButton(vec2(levelSize.x - 6, 3))
+    explosionButton = new CorpseBombButton(vec2(levelSize.x - 18, 9))
     summonButton = new RaiseDeadButton(vec2(levelSize.x - 6, 9))
-    causeFear = new CauseFearButton(vec2(levelSize.x - 18, 3))
-    drainSoul = new DrainSoulButton(vec2(levelSize.x - 18, 9))
+    spreadDecay = new SpreadDecayButton(vec2(levelSize.x - 18, 3))
+    regenManaButton = new RegenManaButton(vec2(levelSize.x - 6, 3))
 
     graves = [];
     enemies = [];

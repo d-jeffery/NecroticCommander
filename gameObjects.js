@@ -17,6 +17,10 @@ function easeOutBounce(x) {
     }
 }
 
+function isClicked(o) {
+    return (o === cursor && mouseIsDown(0)) || (o === cursor && gamepadIsDown(0))
+}
+
 // Particles
 function particleExplode(color1, color2, pos, size) {
     // Particle explosion
@@ -24,7 +28,7 @@ function particleExplode(color1, color2, pos, size) {
         pos, 0, size, .1, 200, PI,  // pos, angle, emitSize, emitTime, emitRate, emiteCone
         0, vec2(16),                          // tileIndex, tileSize
         color1, color2,                       // colorStartA, colorStartB
-        color1.scale(1,0), color2.scale(1,0), // colorEndA, colorEndB
+        color1.scale(1, 0), color2.scale(1, 0), // colorEndA, colorEndB
         .2, 1, 1, .1, .05,    // particleTime, sizeStart, sizeEnd, particleSpeed, particleAngleSpeed
         .99, .95, .4, PI, .1, // damping, angleDamping, gravityScale, particleCone, fadeRate,
         1, 0, 1               // randomness, collide, additive, randomColorLinear, renderOrder
@@ -35,7 +39,7 @@ function particleExplode(color1, color2, pos, size) {
 // Player
 class Necromancer extends EngineObject {
     constructor(pos) {
-        super(pos, vec2(4), 8);
+        super(pos, vec2(4), 9);
         this.setCollision(1, 1)
         this.renderOrder = 10
         this.health = 100;
@@ -51,20 +55,13 @@ class Necromancer extends EngineObject {
 
         if (this.generationTime > 5 && this.mana < 10) {
             this.mana++;
+            if (regenManaButton.selected && this.mana < 10) {
+                this.mana++
+            }
             this.generationTime = 0;
         }
         this.generationTime += timeDelta;
     }
-
-    //     if (isUsingGamepad) {
-    //         this.pos.x += gamepadStick(1).x;
-    //     } else if (keyIsDown(37)) {
-    //         this.pos.x -= 0.2;
-    //     } else if (keyIsDown(39)) {
-    //         this.pos.x += 0.2;
-    //     }
-    //     this.pos.x = clamp(this.pos.x, this.size.x/2, levelSize.x - this.size.x/2);
-    // }
 }
 
 // Summons
@@ -72,21 +69,30 @@ class Grave extends EngineObject {
     constructor(pos) {
         super(pos, vec2(3), 5);
         this.setCollision(1);
+        this.full = true;
+    }
+
+    refill() {
+        this.full = true;
+        this.tileIndex = 5;
     }
 
     collideWithObject(o) {
+        if (!this.full) {
+            return;
+        }
+
         if (summonButton.selected && necromancer.mana > 0) {
-            if ((o === cursor && mouseIsDown(0)) ||
-                (o === cursor && gamepadIsDown(0))) {
+            if (isClicked(o)) {
                 summons.push(new Summon(this.pos));
+                this.full = false;
+                this.tileIndex = 6
                 necromancer.mana--;
 
                 // Particle explosion
                 const color1 = new Color(0.70, 0.44, 0.44);
                 const color2 = color1.lerp(new Color, .5);
                 particleExplode(color1, color2, this.pos, this.size);
-
-                this.destroy();
             }
         }
         return false;
@@ -110,7 +116,7 @@ class Unit extends EngineObject {
 
     update() {
         super.update();
-        if (this.health < 0){
+        if (this.health < 0) {
             particleExplode(new Color(1, 0, 0), new Color(0, 0, 0), this.pos, this.size);
             this.destroy();
         }
@@ -135,7 +141,7 @@ class Unit extends EngineObject {
             abs(this.pos.y - this.target.y) < 0.1) {
             this.target = undefined;
             // this.moveTime = 0;
-            this.velocity = vec2(0,0);
+            this.velocity = vec2(0, 0);
             return;
         } else {
             const angle = this.target.subtract(this.pos);
@@ -178,7 +184,7 @@ class Summon extends Unit {
 
             this.target = closest;
 
-            this.moveTowardsTarget(easeOutBounce);
+            this.moveTowardsTarget();
         } else {
             super.wander();
         }
@@ -200,11 +206,22 @@ class Enemy extends Unit {
     constructor(pos, tile) {
         super(pos, tile);
     }
+
+    collideWithObject(o) {
+        if (o instanceof Enemy) {
+            this.target = undefined;
+            return true;
+        } else if (o instanceof Summon || o instanceof Necromancer) {
+            this.attack(o, 1)
+            return true;
+        }
+        return false;
+    }
 }
 
 class Peasant extends Enemy {
     constructor(pos) {
-        super(pos, Math.round(rand(6, 7)));
+        super(pos, Math.round(rand(7, 8)));
     }
 
     // TODO: Flee mechanic
@@ -216,7 +233,7 @@ class Peasant extends Enemy {
             //Huddle
             this.target = enemies.reduce((t, e) => {
                 return t.add(e.pos);
-            }, vec2(0,0)).scale(1 / enemies.length);
+            }, vec2(0, 0)).scale(1 / enemies.length);
         } else if (summons.length > 0) {
             // Attack
             let closest = undefined;
@@ -235,21 +252,10 @@ class Peasant extends Enemy {
         }
 
         if (this.target) {
-            this.moveTowardsTarget(smoothStep);
+            this.moveTowardsTarget();
         } else {
             this.wander();
         }
-    }
-
-    collideWithObject(o) {
-        if (o instanceof Enemy) {
-            this.target = undefined;
-            return true;
-        } else if (o instanceof Summon || o instanceof Necromancer) {
-            this.attack(o, 1)
-            return true;
-        }
-        return false;
     }
 }
 
@@ -258,7 +264,7 @@ class Peasant extends Enemy {
 class Cursor extends EngineObject {
     constructor(pos) {
         super(pos, vec2(3), 1, vec2(16), 0);
-        this.setCollision(1,1);
+        this.setCollision(1, 1);
 
         this.addChild(new ParticleEmitter(
             vec2(0, 0), 0, objectDefaultSize, 0, 4, 0,  // pos, angle, emitSize, emitTime, emitRate, emiteCone
@@ -284,14 +290,14 @@ class Cursor extends EngineObject {
             this.pos.y = mousePos.y;
         }
         this.pos.x = clamp(this.pos.x, this.size.x / 2, levelSize.x - this.size.x / 2);
-        this.pos.y = clamp(this.pos.y, this.size.y / 2, levelSize.y - this.size.y / 2);
+        this.pos.y = clamp(this.pos.y, this.size.y / 2, levelSize.y - this.size.y / 2)
     }
 }
 
 // Buttons
 class Button extends EngineObject {
     constructor(pos, text, color, backgroundColor) {
-        super(pos, vec2( 15, 4));
+        super(pos, vec2(11, 5));
         this.text = text;
         this.color = color;
         this.backgroundColor = backgroundColor;
@@ -309,14 +315,14 @@ class Button extends EngineObject {
             this.backgroundColor = new Color(0.5, 0, 0);
         }
 
-        drawRect(vec2(this.pos.x, this.pos.y), vec2( 11, 5), this.backgroundColor);
-        drawRect(vec2(this.pos.x, this.pos.y), vec2( 10, 4), this.color);
+        drawRect(vec2(this.pos.x, this.pos.y), vec2(11, 5), this.backgroundColor);
+        drawRect(vec2(this.pos.x, this.pos.y), vec2(10, 4), this.color);
         this.font.drawText(this.text, vec2(this.pos.x, this.pos.y + 1.5), 0.2, true);
     }
 
     collideWithObject(o) {
-        if ((o === cursor && mouseIsDown(0)) || (o === cursor && gamepadIsDown(0))) {
-            engineObjects.forEach( (obj) => {
+        if (isClicked(o)) {
+            engineObjects.forEach((obj) => {
                 if (obj instanceof Button) {
                     obj.selected = false;
                 }
@@ -339,14 +345,14 @@ class CorpseBombButton extends Button {
     }
 }
 
-class CauseFearButton extends Button {
+class SpreadDecayButton extends Button {
     constructor(pos) {
-        super(pos, "Cause\nFear", new Color(1, 0, 0), new Color(0.5, 0, 0));
+        super(pos, "Spread\nDecay", new Color(1, 0, 0), new Color(0.5, 0, 0));
     }
 }
 
-class DrainSoulButton extends Button {
+class RegenManaButton extends Button {
     constructor(pos) {
-        super(pos, "Drain\nSoul", new Color(1, 0, 0), new Color(0.5, 0, 0));
+        super(pos, "Regen\nMana", new Color(1, 0, 0), new Color(0.5, 0, 0));
     }
 }
