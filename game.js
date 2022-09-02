@@ -16,7 +16,7 @@
 // popup errors if there are any (help diagnose issues on mobile devices)
 // onerror = (...parameters)=> alert(parameters);
 
-let levelSize, cursor, necromancer, hudHeight;
+let levelSize, tileLayer, cursor, necromancer, hudHeight;
 let summonButton, explosionButton, spreadDecay, regenManaButton;
 let summons, enemies, graves;
 
@@ -26,9 +26,10 @@ let hudY = 13;
 function startGame() {
     necromancer = new Necromancer(vec2(levelSize.x / 2, 20));
     cursor = new Cursor(vec2(levelSize.x / 2, levelSize.y / 2))
-    explosionButton = new CorpseBombButton(vec2(levelSize.x - 18, 9))
+
+    explosionButton = new CorpseBombButton(vec2(levelSize.x - 18, 3))
     summonButton = new RaiseDeadButton(vec2(levelSize.x - 6, 9))
-    spreadDecay = new SpreadDecayButton(vec2(levelSize.x - 18, 3))
+    spreadDecay = new SpreadDecayButton(vec2(levelSize.x - 18, 9))
     regenManaButton = new RegenManaButton(vec2(levelSize.x - 6, 3))
 
     graves = [];
@@ -36,7 +37,7 @@ function startGame() {
     summons = [];
 
     for(let i = -15; i < 17; i += 6) {
-        enemies.push(new Peasant(vec2(cameraPos.x + i, cameraPos.y + 32)))
+        enemies.push(new Peasant(vec2(cameraPos.x + i, cameraPos.y + 34)))
     }
 
     for(let i = -15; i < 17; i += 6) {
@@ -44,6 +45,24 @@ function startGame() {
             graves.push(new Grave(vec2(cameraPos.x + i, cameraPos.y + j + 8)))
         }
     }
+}
+
+
+function makeTileLayers() {
+    initTileCollision(levelSize)
+    // create tile layers
+    tileLayer = new TileLayer(vec2(-1, 0), tileCollisionSize);
+    tileLayer.renderOrder = -1e3;
+    tileLayer.scale = vec2(3)
+
+    const pos = vec2(15, 21);
+    while(pos.x--) {
+        if (pos.x >= 6 && pos.x <= 9) continue;
+        setTileCollisionData(pos.scale(3), 1);
+        tileLayer.setData(pos, new TileLayerData(16));
+    }
+
+    tileLayer.redraw();
 }
 
 function tearDown() {
@@ -58,6 +77,28 @@ function gameInit() {
     levelSize = vec2(40, 72);
     hudHeight = 15;
     cameraPos = levelSize.scale(.5);
+
+    cameraScale = 16
+
+    makeTileLayers();
+    //
+    // initTileCollision(vec2(16, 16));
+    // const tileLayer = new TileLayer(vec2(), levelSize, tileSizeDefault);
+    //
+    //
+    // console.log(tileCollisionSize)
+    // const pos = vec2(0, tileCollisionSize.y - 8);
+    //
+    // const data = new TileLayerData(16);
+    // tileLayer.setData(vec2(15,20), data);
+    //
+    //
+    // for (pos.x = tileCollisionSize.x; pos.x--;) {
+    //         setTileCollisionData(pos, 1);
+    //         const data = new TileLayerData(16);
+    //         tileLayer.setData(pos, data);
+    // }
+    // tileLayer.redraw();
 
     startGame();
 }

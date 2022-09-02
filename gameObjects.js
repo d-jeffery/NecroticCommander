@@ -194,7 +194,7 @@ class Summon extends Unit {
         if (o instanceof Enemy) {
             this.attack(o, 1)
             return true;
-        } else if (o instanceof Unit) {
+        } else if (o instanceof Unit || o instanceof Necromancer) {
             this.target = undefined;
             return true;
         }
@@ -353,6 +353,6 @@ class SpreadDecayButton extends Button {
 
 class RegenManaButton extends Button {
     constructor(pos) {
-        super(pos, "Regen\nMana", new Color(1, 0, 0), new Color(0.5, 0, 0));
+        super(pos, "Drain\nSoul", new Color(1, 0, 0), new Color(0.5, 0, 0));
     }
 }
