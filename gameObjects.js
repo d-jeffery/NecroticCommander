@@ -302,7 +302,7 @@ class Button extends EngineObject {
         this.color = color;
         this.backgroundColor = backgroundColor;
         this.selected = false;
-        this.font = new FontImage();
+        this.font = new FontImage(undefined, vec2(8), vec2(0, 1), 0, mainContext);
         this.setCollision(1);
     }
 
@@ -315,8 +315,8 @@ class Button extends EngineObject {
             this.backgroundColor = new Color(0.5, 0, 0);
         }
 
-        drawRect(vec2(this.pos.x, this.pos.y), vec2(11, 5), this.backgroundColor);
-        drawRect(vec2(this.pos.x, this.pos.y), vec2(10, 4), this.color);
+        drawRect(vec2(this.pos.x, this.pos.y), vec2(11, 5), this.backgroundColor, 0, false);
+        drawRect(vec2(this.pos.x, this.pos.y), vec2(10, 4), this.color, 0, false);
         this.font.drawText(this.text, vec2(this.pos.x, this.pos.y + 1.5), 0.2, true);
     }
 
