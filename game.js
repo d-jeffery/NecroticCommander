@@ -48,16 +48,17 @@ function startGame() {
 }
 
 
-function makeTileLayers() {
-    initTileCollision(levelSize)
-    // create tile layers
-    tileLayer = new TileLayer(vec2(-1, 0), tileCollisionSize);
-    tileLayer.renderOrder = -1e3;
-    tileLayer.scale = vec2(3)
+function makeTileLayers(size) {
+    initTileCollision(size)
 
-    const pos = vec2(15, 21);
+    tileLayer = new TileLayer(vec2(), size, vec2(16), vec2(3));
+    tileLayer.renderOrder = 2;
+
+    const pos = vec2(14, 21);
     while(pos.x--) {
-        if (pos.x >= 6 && pos.x <= 9) continue;
+
+        if (pos.x >= 5 && pos.x <= 7) continue;
+
         setTileCollisionData(pos.scale(3), 1);
         tileLayer.setData(pos, new TileLayerData(16));
     }
@@ -76,11 +77,10 @@ function gameInit() {
     canvasFixedSize = vec2(720, 1280); // 720p
     levelSize = vec2(40, 72);
     hudHeight = 15;
-    cameraPos = levelSize.scale(.5);
-
+    cameraPos = levelSize.scale(0.5);
     cameraScale = 16
 
-    makeTileLayers();
+    makeTileLayers(levelSize);
     //
     // initTileCollision(vec2(16, 16));
     // const tileLayer = new TileLayer(vec2(), levelSize, tileSizeDefault);
