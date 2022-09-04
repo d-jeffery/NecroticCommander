@@ -43,7 +43,7 @@ class Necromancer extends EngineObject {
         this.setCollision(1, 1)
         this.renderOrder = 10
         this.health = 100;
-        this.mana = 10;
+        this.mana = 100;
         this.generationTime = 0;
     }
 
@@ -82,12 +82,12 @@ class Grave extends EngineObject {
             return;
         }
 
-        if (summonButton.selected && necromancer.mana > 0) {
+        if (summonButton.selected && necromancer.mana - 10 >= 0) {
             if (isClicked(o)) {
                 summons.push(new Summon(this.pos));
                 this.full = false;
                 this.tileIndex = 6
-                necromancer.mana--;
+                necromancer.mana -= 10;
 
                 // Particle explosion
                 const color1 = new Color(0.70, 0.44, 0.44);

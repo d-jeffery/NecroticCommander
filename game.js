@@ -44,32 +44,19 @@ function startGame() {
     }
 }
 
-
 function makeTileLayers(size) {
     initTileCollision(size)
 
-    tileLayer = new TileLayer(vec2(0, 0), size, vec2(16), vec2(3));
+    tileLayer = new TileLayer(vec2(0, 0), size, vec2(16), vec2(2));
     tileLayer.renderOrder = 2;
 
-    let pos = vec2(0, 21);
-    while(pos.x < (levelSize.x / 3)) {
-        if (!(pos.x >= 5 && pos.x <= 8)) {
-            setTileCollisionData(pos.scale(3), 1);
+    let pos = vec2(0, 35);
+    while(pos.x < (levelSize.x / 2)) {
+        if (!(pos.x >= 7 && pos.x <= 14)) {
+            setTileCollisionData(pos.scale(2), 1);
             tileLayer.setData(pos, new TileLayerData(16));
         }
         pos.x++
-    }
-
-    pos = vec2(0, 21);
-    while(pos.y-- > 5) {
-        setTileCollisionData(pos.scale(3), 1);
-        tileLayer.setData(pos, new TileLayerData(17));
-    }
-
-    pos = vec2(13, 21);
-    while(pos.y-- > 5) {
-        setTileCollisionData(pos.scale(3), 1);
-        tileLayer.setData(pos, new TileLayerData(17));
     }
 
     tileLayer.redraw();
@@ -88,37 +75,13 @@ function gameInit() {
     cameraPos = levelSize.scale(0.5);
     cameraScale = 16
 
-    //makeTileLayers(levelSize);
-    //
-    // initTileCollision(vec2(16, 16));
-    // const tileLayer = new TileLayer(vec2(), levelSize, tileSizeDefault);
-    //
-    //
-    // console.log(tileCollisionSize)
-    // const pos = vec2(0, tileCollisionSize.y - 8);
-    //
-    // const data = new TileLayerData(16);
-    // tileLayer.setData(vec2(15,20), data);
-    //
-    //
-    // for (pos.x = tileCollisionSize.x; pos.x--;) {
-    //         setTileCollisionData(pos, 1);
-    //         const data = new TileLayerData(16);
-    //         tileLayer.setData(pos, data);
-    // }
-    // tileLayer.redraw();
+    // makeTileLayers(levelSize);
 
     startGame();
 }
 
 /// ////////////////////////////////////////////////////////////////////////////
 function gameUpdate() {
-    // if (skeletonButton.selected && cursor.pos.y > hudHeight) {
-    //     if (mouseIsDown(0) || gamepadIsDown(0)) {
-    //         units.push(new Skeleton(cursor.pos))
-    //     }
-    // }
-
 
 }
 
@@ -149,17 +112,21 @@ function gameRender() {
     drawRect(vec2(22, 7), vec2(levelSize.x - 3, 12), 2, new Color(1, 1, 1), false);
 
     const healthY = 9;
+    const healthX = necromancer.health * 0.14;
+
     font.drawText("Health", vec2(2, 12), 0.2);
-    drawLine(vec2(2, 9), vec2(10 * 1.5 + 0.5, healthY), 2, new Color(0.5, 0.5, 0.5));
-    if (necromancer.health) {
-        drawLine(vec2(2.5, healthY), vec2(necromancer.health * 1.5 / 10, healthY), 1, new Color(1, 0, 0));
+    drawLine(vec2(2, healthY), vec2(18, healthY), 2, new Color(0.5, 0.5, 0.5))
+    if (necromancer.health > 0) {
+        drawLine(vec2(3, healthY), vec2( 3 + healthX, healthY), 1, new Color(1, 0, 0))
     }
 
     const manaY = 3;
+    const manaX = necromancer.mana * 0.14;
+
     font.drawText("Mana", vec2(2, 6), 0.2);
-    drawLine(vec2(2, manaY), vec2(10 * 1.5 + 0.5, manaY), 2, new Color(0.5, 0.5, 0.5));
-    if (necromancer.mana) {
-        drawLine(vec2(2.5, manaY), vec2(necromancer.mana * 1.5, manaY), 1, new Color(0, 0, 1));
+    drawLine(vec2(2, manaY), vec2(18, manaY), 2, new Color(0.5, 0.5, 0.5))
+    if (necromancer.mana > 0) {
+        drawLine(vec2(3, manaY), vec2(3 + manaX, manaY), 1, new Color(0, 0, 1))
     }
 }
 
