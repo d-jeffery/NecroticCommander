@@ -17,7 +17,7 @@
 // onerror = (...parameters)=> alert(parameters);
 
 let levelSize, tileLayer, cursor, necromancer, hudHeight;
-let summonButton, explosionButton, spreadDecay, regenManaButton;
+let summonButton, explosionButton, netherBoltButton, regenManaButton;
 let summons, enemies, graves;
 
 function startGame() {
@@ -26,7 +26,7 @@ function startGame() {
 
     explosionButton = new CorpseBombButton(vec2(levelSize.x - 20, 4))
     summonButton = new RaiseDeadButton(vec2(levelSize.x - 8, 10))
-    spreadDecay = new SpreadDecayButton(vec2(levelSize.x - 20, 10))
+    netherBoltButton = new NetherBoltButton(vec2(levelSize.x - 20, 10))
     regenManaButton = new RegenManaButton(vec2(levelSize.x - 8, 4))
 
     graves = [];

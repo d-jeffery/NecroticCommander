@@ -17,6 +17,10 @@ function easeOutBounce(x) {
     }
 }
 
+function isDown() {
+    return (mouseIsDown(0) || gamepadIsDown(0))
+}
+
 function isClicked(o) {
     return (o === cursor && mouseIsDown(0)) || (o === cursor && gamepadIsDown(0))
 }
@@ -45,6 +49,7 @@ class Necromancer extends EngineObject {
         this.health = 100;
         this.mana = 100;
         this.generationTime = 0;
+        this.boltThrowTime = 0;
     }
 
     update() {
@@ -53,10 +58,24 @@ class Necromancer extends EngineObject {
             return;
         }
 
-        if (this.generationTime > 5 && this.mana < 10) {
-            this.mana++;
+        this.boltThrowTime += timeDelta;
+        if (netherBoltButton.selected &&
+            isClicked(cursor) &&
+            cursor.pos.y > this.pos.y &&
+            this.mana >= 10 &&
+            this.boltThrowTime > 1) {
+
+            const angle = cursor.pos.subtract(this.pos);
+            const bolt = new Bolt(this.pos, angle.angle());
+            bolt.applyForce(angle.normalize());
+            this.mana -= 5;
+            this.boltThrowTime = 0;
+        }
+
+        if (this.generationTime > 1 && this.mana < 10) {
+            this.mana += 10;
             if (regenManaButton.selected && this.mana < 10) {
-                this.mana++
+                this.mana += 10;
             }
             this.generationTime = 0;
         }
@@ -146,7 +165,7 @@ class Unit extends EngineObject {
         } else {
             const angle = this.target.subtract(this.pos);
             this.applyForce(angle.scale(0.01));
-        }
+        }``
 
         this.velocity.x = clamp(this.velocity.x, -this.maxVelocity, this.maxVelocity);
         this.velocity.y = clamp(this.velocity.y, -this.maxVelocity, this.maxVelocity);
@@ -259,11 +278,28 @@ class Peasant extends Enemy {
     }
 }
 
+class Bolt extends EngineObject {
+    constructor(pos, angle) {
+        super(pos, vec2(2), 10, vec2(16), angle);
+        this.setCollision(1, 1);
+        this.renderOrder = 50;
+    }
+
+    collideWithObject(o) {
+        if (o instanceof Unit) {
+            this.destroy();
+            o.health -= 50;
+            particleExplode(new Color(0, 1, 0), new Color(0, 0, 0), this.pos, this.size);
+            return true;
+        }
+        return false;
+    }
+}
 
 // Cursor
 class Cursor extends EngineObject {
     constructor(pos) {
-        super(pos, vec2(3), 1, vec2(16), 0);
+        super(pos, vec2(2), 1, vec2(16), 0);
         this.setCollision(1, 1);
 
         this.addChild(new ParticleEmitter(
@@ -321,7 +357,7 @@ class Button extends EngineObject {
     }
 
     collideWithObject(o) {
-        if (isClicked(o)) {
+        if (isOverlapping(cursor.pos, cursor.size, this.pos, this.size) && isDown()) {
             engineObjects.forEach((obj) => {
                 if (obj instanceof Button) {
                     obj.selected = false;
@@ -345,9 +381,9 @@ class CorpseBombButton extends Button {
     }
 }
 
-class SpreadDecayButton extends Button {
+class NetherBoltButton extends Button {
     constructor(pos) {
-        super(pos, "Spread\nDecay", new Color(1, 0, 0), new Color(0.5, 0, 0));
+        super(pos, "Nether\nBolt", new Color(1, 0, 0), new Color(0.5, 0, 0));
     }
 }
 
