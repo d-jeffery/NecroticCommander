@@ -43,7 +43,7 @@ function particleExplode(color1, color2, pos, size) {
 // Player
 class Necromancer extends EngineObject {
     constructor(pos) {
-        super(pos, vec2(4), 9);
+        super(pos, vec2(4), 10);
         this.setCollision(1, 1)
         this.renderOrder = 10
         this.health = 100;
@@ -66,7 +66,7 @@ class Necromancer extends EngineObject {
         this.boltThrowTime += timeDelta;
         if (netherBoltButton.selected &&
             isClicked(cursor) &&
-            cursor.pos.y > this.pos.y &&
+            cursor.pos.y > hudHeight &&
             this.mana >= 10 &&
             this.boltThrowTime > 0.5) {
 
@@ -88,7 +88,7 @@ class Necromancer extends EngineObject {
 // Summons
 class Grave extends EngineObject {
     constructor(pos) {
-        super(pos, vec2(3), 5);
+        super(pos, vec2(3), 6);
         this.setCollision(1);
         this.full = true;
     }
@@ -107,7 +107,7 @@ class Grave extends EngineObject {
             if (isClicked(o)) {
                 summons.push(new Summon(this.pos));
                 this.full = false;
-                this.tileIndex = 6
+                this.tileIndex = 7
                 necromancer.mana -= 10;
 
                 // Particle explosion
@@ -127,7 +127,7 @@ class Unit extends EngineObject {
         this.friction = 0.9;
         this.mass = 10;
         this.elasticity = 0.5;
-        this.maxVelocity = 0.1;
+        this.maxVelocity = rand(0.08, 0.12);
 
         this.target = undefined;
         this.health = 100;
@@ -187,7 +187,7 @@ class Unit extends EngineObject {
 
 class Summon extends Unit {
     constructor(pos) {
-        super(pos, Math.round(rand(2, 4)));
+        super(pos, Math.round(rand(3, 5)));
     }
 
     update() {
@@ -242,7 +242,7 @@ class Enemy extends Unit {
 
 class Peasant extends Enemy {
     constructor(pos) {
-        super(pos, Math.round(rand(7, 8)));
+        super(pos, Math.round(rand(8, 9)));
     }
 
     // TODO: Flee mechanic
@@ -282,7 +282,7 @@ class Peasant extends Enemy {
 
 class Bolt extends EngineObject {
     constructor(pos, angle) {
-        super(pos, vec2(2), 10, vec2(16), angle);
+        super(pos, vec2(2), 11, vec2(16), angle);
         this.setCollision(1, 1);
         this.renderOrder = 50;
     }
@@ -291,6 +291,7 @@ class Bolt extends EngineObject {
         if (o instanceof Unit) {
             this.destroy();
             o.health -= 50;
+            o.applyAcceleration(this.velocity)
             particleExplode(new Color(0, 1, 0), new Color(0, 0, 0), this.pos, this.size);
             return true;
         }

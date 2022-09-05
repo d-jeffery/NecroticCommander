@@ -2,11 +2,10 @@
     NecroticCommander
 
     TODO:
-    Attack animations & health bars
+    Attack animations
     Add waves of enemies
     Add Knights to embolden the peasants
     Actually decide what it does, and implement, "Corpse explosion"
-    Sprite for the necromancer, sitting in his tower
     Introduction to set the scene
     Polish UI
 */
@@ -16,15 +15,17 @@
 // popup errors if there are any (help diagnose issues on mobile devices)
 // onerror = (...parameters)=> alert(parameters);
 
-let levelSize, tileLayer, cursor, necromancer, hudHeight;
+let levelSize, tileLayer, cursor, necromancer;
 let summonButton, explosionButton, netherBoltButton, regenManaButton;
 let summons, enemies, graves;
+let hudHeight, endTime;
 
 function startGame() {
     necromancer = new Necromancer(vec2(levelSize.x / 2, 22));
     cursor = new Cursor(vec2(levelSize.x / 2, levelSize.y / 2))
 
     hudHeight = 15;
+    endTime = 1;
 
     explosionButton = new CorpseBombButton(vec2(levelSize.x - 20, 4))
     summonButton = new RaiseDeadButton(vec2(levelSize.x - 8, 10))
@@ -90,9 +91,12 @@ function gameUpdatePost() {
     summons = summons.filter((s) => !s.destroyed);
 
     if (necromancer.health <= 0) {
+        endTime -= timeDelta;
         necromancer.health = 0;
         necromancer.destroy()
-        paused = true;
+        if (endTime <= 0) {
+            paused = true;
+        }
         if (mouseIsDown(0) || gamepadIsDown(0)) {
             paused = false;
             tearDown();
@@ -131,10 +135,9 @@ function gameRender() {
 /// ////////////////////////////////////////////////////////////////////////////
 function gameRenderPost() {
     const font = new FontImage();
-    if (necromancer.health === 0) {
-        drawRect(cameraPos, vec2(35, 25), new Color(0, 0, 0), 0, true);
-
-        font.drawText("YOUR REIGN\nHAS ENDED\n\nClick to\nretry", vec2(cameraPos.x, cameraPos.y + 8), 0.4, true);
+    if (necromancer.health === 0 && endTime <= 0) {
+        drawRect(vec2(cameraPos.x, cameraPos.y + 10), vec2(35, 25), new Color(0, 0, 0), 0, true);
+        font.drawText("YOUR REIGN\nHAS ENDED\n\nClick to\nretry", vec2(cameraPos.x, cameraPos.y + 18), 0.4, true);
     }
 }
 
