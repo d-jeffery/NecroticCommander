@@ -39,8 +39,9 @@ function startGame() {
         enemies.push(new Peasant(vec2(cameraPos.x + i, cameraPos.y + 34)))
     }
 
-    for(let i = -15; i < 17; i += 6) {
-        for(let j = -15; j < 17; j += 6) {
+    for(let i = -18; i < 20; i += 6) {
+        for(let j = -18; j < 20; j += 6) {
+            if (i === 0) continue;
             graves.push(new Grave(vec2(cameraPos.x + i, cameraPos.y + j + 8)))
         }
     }
@@ -52,8 +53,7 @@ function makeTileLayers(size) {
     tileLayer = new TileLayer(vec2(0, 0), size, vec2(16), vec2(4));
     tileLayer.renderOrder = 10;
 
-    let pos = vec2(5, hudHeight);
-    for(;pos.y < size.y; pos.y++) {
+    for(let pos = vec2(5, hudHeight); pos.y < size.y; pos.y++) {
         tileLayer.setData(pos, new TileLayerData(16));
     }
 

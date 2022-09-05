@@ -162,7 +162,7 @@ class Unit extends EngineObject {
         } else {
             const angle = this.target.subtract(this.pos);
             this.applyForce(angle.scale(0.01));
-        }``
+        }
 
         this.velocity.x = clamp(this.velocity.x, -this.maxVelocity, this.maxVelocity);
         this.velocity.y = clamp(this.velocity.y, -this.maxVelocity, this.maxVelocity);
