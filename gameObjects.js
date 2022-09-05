@@ -118,6 +118,11 @@ class Necromancer extends EngineObject {
             this.mana += 5;
             this.generationTime = 0;
         }
+
+        if (this.mana > manaPool) {
+            this.mana = manaPool;
+        }
+
         this.generationTime += timeDelta;
     }
 }
@@ -272,12 +277,20 @@ class Enemy extends Unit {
     }
 
     collideWithObject(o) {
+        this.color = new Color(1, 1, 1);
         if (o instanceof Enemy) {
             this.target = undefined;
             return true;
         } else if (o instanceof Summon || o instanceof Necromancer) {
             this.attack(o, 1)
             return true;
+        } else if (isClicked(o) &&
+            drainSoulButton.selected &&
+            necromancer.mana < 100) {
+            this.health -= 1 * timeDelta;
+            necromancer.mana += 5 * timeDelta;
+            this.color = new Color(0, 1, 1);
+            return false;
         }
         return false;
     }
@@ -434,7 +447,7 @@ class NetherBoltButton extends Button {
     }
 }
 
-class RegenManaButton extends Button {
+class DrainSoulButton extends Button {
     constructor(pos) {
         super(pos, "Drain\nSoul", new Color(1, 0, 0), new Color(0.5, 0, 0));
     }

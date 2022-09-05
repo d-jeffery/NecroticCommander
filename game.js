@@ -16,7 +16,7 @@
 // onerror = (...parameters)=> alert(parameters);
 
 let levelSize, tileLayer, cursor, necromancer;
-let summonButton, explosionButton, netherBoltButton, regenManaButton;
+let summonButton, explosionButton, netherBoltButton, drainSoulButton;
 let summons, enemies, graves;
 let hudHeight, endTime, screenShake;
 
@@ -31,7 +31,7 @@ function startGame() {
     explosionButton = new CorpseBombButton(vec2(levelSize.x - 20, 4))
     summonButton = new RaiseDeadButton(vec2(levelSize.x - 8, 10))
     netherBoltButton = new NetherBoltButton(vec2(levelSize.x - 20, 10))
-    regenManaButton = new RegenManaButton(vec2(levelSize.x - 8, 4))
+    drainSoulButton = new DrainSoulButton(vec2(levelSize.x - 8, 4))
 
     graves = [];
     enemies = [];
@@ -131,9 +131,9 @@ function gameRender() {
     }
 
     const manaY = 3;
-    const manaX = necromancer.mana * 0.14;
+    const manaX = Math.floor(necromancer.mana * 0.14);
 
-    font.drawText(`Mana (${necromancer.mana})`, vec2(10, 6), 0.18, true);
+    font.drawText(`Mana (${Math.floor(necromancer.mana)})`, vec2(10, 6), 0.18, true);
     drawLine(vec2(2, manaY), vec2(18, manaY), 2, new Color(0.5, 0.5, 0.5))
     if (necromancer.mana > 0) {
         drawLine(vec2(3, manaY), vec2(3 + manaX, manaY), 1, new Color(0, 0, 1))
