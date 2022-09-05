@@ -24,6 +24,8 @@ function startGame() {
     necromancer = new Necromancer(vec2(levelSize.x / 2, 20));
     cursor = new Cursor(vec2(levelSize.x / 2, levelSize.y / 2))
 
+    hudHeight = 15;
+
     explosionButton = new CorpseBombButton(vec2(levelSize.x - 20, 4))
     summonButton = new RaiseDeadButton(vec2(levelSize.x - 8, 10))
     netherBoltButton = new NetherBoltButton(vec2(levelSize.x - 20, 10))
@@ -47,16 +49,12 @@ function startGame() {
 function makeTileLayers(size) {
     initTileCollision(size)
 
-    tileLayer = new TileLayer(vec2(0, 0), size, vec2(16), vec2(2));
-    tileLayer.renderOrder = 2;
+    tileLayer = new TileLayer(vec2(0, 0), size, vec2(16), vec2(4));
+    tileLayer.renderOrder = 10;
 
-    let pos = vec2(0, 35);
-    while(pos.x < (levelSize.x / 2)) {
-        if (!(pos.x >= 7 && pos.x <= 14)) {
-            setTileCollisionData(pos.scale(2), 1);
-            tileLayer.setData(pos, new TileLayerData(16));
-        }
-        pos.x++
+    let pos = vec2(5, hudHeight);
+    for(;pos.y < size.y; pos.y++) {
+        tileLayer.setData(pos, new TileLayerData(16));
     }
 
     tileLayer.redraw();
@@ -73,9 +71,9 @@ function gameInit() {
     canvasFixedSize = vec2(720, 1280); // 720p
     levelSize = vec2(44, 80);
     cameraPos = levelSize.scale(0.5);
-    cameraScale = 16
+    cameraScale = 16;
 
-    // makeTileLayers(levelSize);
+    makeTileLayers(levelSize);
 
     startGame();
 }
@@ -136,7 +134,7 @@ function gameRenderPost() {
     if (necromancer.health === 0) {
         drawRect(cameraPos, vec2(35, 25), new Color(0, 0, 0), 0, true);
 
-        font.drawText("YOU HAVE\nDIED\n\nClick to\nrestart", vec2(cameraPos.x, cameraPos.y + 8), 0.4, true);
+        font.drawText("YOUR REIGN\nHAS ENDED\n\nClick to\nretry", vec2(cameraPos.x, cameraPos.y + 8), 0.4, true);
     }
 }
 

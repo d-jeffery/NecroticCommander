@@ -63,20 +63,17 @@ class Necromancer extends EngineObject {
             isClicked(cursor) &&
             cursor.pos.y > this.pos.y &&
             this.mana >= 10 &&
-            this.boltThrowTime > 1) {
+            this.boltThrowTime > 0.5) {
 
             const angle = cursor.pos.subtract(this.pos);
             const bolt = new Bolt(this.pos, angle.angle());
             bolt.applyForce(angle.normalize());
-            this.mana -= 5;
+            this.mana -= 10;
             this.boltThrowTime = 0;
         }
 
-        if (this.generationTime > 1 && this.mana < 10) {
-            this.mana += 10;
-            if (regenManaButton.selected && this.mana < 10) {
-                this.mana += 10;
-            }
+        if (this.generationTime > 2 && this.mana < 100) {
+            this.mana += 5;
             this.generationTime = 0;
         }
         this.generationTime += timeDelta;
