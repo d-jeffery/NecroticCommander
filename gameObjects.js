@@ -34,20 +34,19 @@ function checkOverlap(r, bombPos, rectPos, rectSize) {
 }
 
 function doExplosion(bomb) {
-    enemies.filter((e) => {
-        if (checkOverlap(5, bomb.pos, e.pos, e.size)) {
+    [...enemies, ...summons].filter((e) => {
+        if (checkOverlap(10, bomb.pos, e.pos, e.size)) {
             e.health -= 50;
-            e.applyAcceleration(bomb.velocity);
+
+            const angle = e.pos.subtract(bomb.pos);
+            e.applyForce(angle.normalize().scale(20));
+
         }
     });
-    summons.filter((e) => {
-        if (checkOverlap(5, bomb.pos, e.pos, e.size)) {
-            e.health -= 50;
-            e.applyAcceleration(bomb.velocity);
-        }
-    });
-    console.log(bomb.size.scale(2))
     particleExplode(new Color(1, 0, 0), new Color(0, 0, 0), bomb.pos, bomb.size.scale(2));
+    particleExplode(new Color(0, 1, 0), new Color(0, 0, 0), bomb.pos, bomb.size.scale(2));
+
+    screenShake = 0.1;
 }
 
 const manaPool = 100;

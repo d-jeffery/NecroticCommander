@@ -18,7 +18,7 @@
 let levelSize, tileLayer, cursor, necromancer;
 let summonButton, explosionButton, netherBoltButton, regenManaButton;
 let summons, enemies, graves;
-let hudHeight, endTime;
+let hudHeight, endTime, screenShake;
 
 function startGame() {
     necromancer = new Necromancer(vec2(levelSize.x / 2, 22));
@@ -26,6 +26,7 @@ function startGame() {
 
     hudHeight = 15;
     endTime = 1;
+    screenShake = 0;
 
     explosionButton = new CorpseBombButton(vec2(levelSize.x - 20, 4))
     summonButton = new RaiseDeadButton(vec2(levelSize.x - 8, 10))
@@ -89,6 +90,13 @@ function gameUpdatePost() {
     graves = graves.filter((g) => !g.destroyed);
     enemies = enemies.filter((e) => !e.destroyed);
     summons = summons.filter((s) => !s.destroyed);
+
+    if (screenShake > 0) {
+        cameraPos.x += rand(-1, 1);
+        screenShake -= timeDelta;
+    } else {
+        cameraPos = levelSize.scale(0.5);
+    }
 
     if (necromancer.health <= 0) {
         endTime -= timeDelta;
