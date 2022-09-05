@@ -21,7 +21,7 @@ let summonButton, explosionButton, netherBoltButton, regenManaButton;
 let summons, enemies, graves;
 
 function startGame() {
-    necromancer = new Necromancer(vec2(levelSize.x / 2, 20));
+    necromancer = new Necromancer(vec2(levelSize.x / 2, 22));
     cursor = new Cursor(vec2(levelSize.x / 2, levelSize.y / 2))
 
     hudHeight = 15;

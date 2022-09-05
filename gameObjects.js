@@ -50,11 +50,16 @@ class Necromancer extends EngineObject {
         this.mana = 100;
         this.generationTime = 0;
         this.boltThrowTime = 0;
+
+        const castle = new EngineObject(this.pos, vec2(5), 17, tileSizeDefault, 0, new Color, 15);
+        this.addChild(castle, vec2(0, -3))
     }
 
     update() {
         if (this.health <= 0) {
             particleExplode(new Color(1, 0, 0), new Color(0, 0, 0), this.pos, this.size);
+            particleExplode(new Color(.4, .4, .4), new Color(0, 0, 0), this.pos, this.size);
+
             return;
         }
 
