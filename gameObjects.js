@@ -17,6 +17,44 @@ function easeOutBounce(x) {
     }
 }
 
+function checkOverlap(r, bombPos, rectPos, rectSize) {
+    const circleDistanceX = abs(bombPos.x - rectPos.x);
+    const circleDistanceY = abs(bombPos.y - rectPos.y);
+
+    if (circleDistanceX > (rectSize.x/2 + r)) { return false; }
+    if (circleDistanceY > (rectSize.y/2 + r)) { return false; }
+
+    if (circleDistanceX <= (rectSize.x/2)) { return true; }
+    if (circleDistanceY <= (rectSize.y/2)) { return true; }
+
+    const cornerDistanceSQ = (circleDistanceX - rectPos.x/2)^2 +
+        (circleDistanceY - rectPos.y/2)^2;
+
+    return (cornerDistanceSQ <= (r^2));
+}
+
+function doExplosion(bomb) {
+    enemies.filter((e) => {
+        if (checkOverlap(5, bomb.pos, e.pos, e.size)) {
+            e.health -= 50;
+            e.applyAcceleration(bomb.velocity);
+        }
+    });
+    summons.filter((e) => {
+        if (checkOverlap(5, bomb.pos, e.pos, e.size)) {
+            e.health -= 50;
+            e.applyAcceleration(bomb.velocity);
+        }
+    });
+    console.log(bomb.size.scale(2))
+    particleExplode(new Color(1, 0, 0), new Color(0, 0, 0), bomb.pos, bomb.size.scale(2));
+}
+
+const manaPool = 100;
+const netherBoltCost = 10;
+const summonCost = 10;
+const explosionCost = 20;
+
 function isDown() {
     return (mouseIsDown(0) || gamepadIsDown(0))
 }
@@ -47,7 +85,7 @@ class Necromancer extends EngineObject {
         this.setCollision(1, 1)
         this.renderOrder = 10
         this.health = 100;
-        this.mana = 100;
+        this.mana = manaPool;
         this.generationTime = 0;
         this.boltThrowTime = 0;
 
@@ -67,17 +105,17 @@ class Necromancer extends EngineObject {
         if (netherBoltButton.selected &&
             isClicked(cursor) &&
             cursor.pos.y > hudHeight &&
-            this.mana >= 10 &&
+            this.mana >= netherBoltCost &&
             this.boltThrowTime > 0.5) {
 
             const angle = cursor.pos.subtract(this.pos);
             const bolt = new Bolt(this.pos, angle.angle());
             bolt.applyForce(angle.normalize());
-            this.mana -= 10;
+            this.mana -= netherBoltCost;
             this.boltThrowTime = 0;
         }
 
-        if (this.generationTime > 2 && this.mana < 100) {
+        if (this.generationTime > 2 && this.mana < manaPool) {
             this.mana += 5;
             this.generationTime = 0;
         }
@@ -103,12 +141,12 @@ class Grave extends EngineObject {
             return;
         }
 
-        if (summonButton.selected && necromancer.mana - 10 >= 0) {
+        if (summonButton.selected && necromancer.mana - summonCost >= 0) {
             if (isClicked(o)) {
                 summons.push(new Summon(this.pos));
                 this.full = false;
                 this.tileIndex = 7
-                necromancer.mana -= 10;
+                necromancer.mana -= summonCost;
 
                 // Particle explosion
                 const color1 = new Color(0.70, 0.44, 0.44);
@@ -151,7 +189,6 @@ class Unit extends EngineObject {
 
         this.moveTowardsTarget();
     }
-
 
     moveTowardsTarget(moveAlg) {
         if (moveAlg === undefined) {
@@ -218,6 +255,13 @@ class Summon extends Unit {
         } else if (o instanceof Unit || o instanceof Necromancer) {
             this.target = undefined;
             return true;
+        } else if (isClicked(o) &&
+            explosionButton.selected &&
+            necromancer.mana - explosionCost > 0) {
+            necromancer.mana -= explosionCost;
+            this.destroy();
+            doExplosion(this);
+            return false;
         }
         return false;
     }
@@ -290,6 +334,7 @@ class Bolt extends EngineObject {
     collideWithObject(o) {
         if (o instanceof Unit) {
             this.destroy();
+            o.target = undefined;
             o.health -= 50;
             o.applyAcceleration(this.velocity)
             particleExplode(new Color(0, 1, 0), new Color(0, 0, 0), this.pos, this.size);

@@ -116,7 +116,7 @@ function gameRender() {
     const healthY = 9;
     const healthX = necromancer.health * 0.14;
 
-    font.drawText("Health", vec2(2, 12), 0.2);
+    font.drawText(`Health (${necromancer.health})`, vec2(10, 12), 0.18, true);
     drawLine(vec2(2, healthY), vec2(18, healthY), 2, new Color(0.5, 0.5, 0.5))
     if (necromancer.health > 0) {
         drawLine(vec2(3, healthY), vec2( 3 + healthX, healthY), 1, new Color(1, 0, 0))
@@ -125,7 +125,7 @@ function gameRender() {
     const manaY = 3;
     const manaX = necromancer.mana * 0.14;
 
-    font.drawText("Mana", vec2(2, 6), 0.2);
+    font.drawText(`Mana (${necromancer.mana})`, vec2(10, 6), 0.18, true);
     drawLine(vec2(2, manaY), vec2(18, manaY), 2, new Color(0.5, 0.5, 0.5))
     if (necromancer.mana > 0) {
         drawLine(vec2(3, manaY), vec2(3 + manaX, manaY), 1, new Color(0, 0, 1))
