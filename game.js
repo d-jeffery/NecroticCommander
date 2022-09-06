@@ -2,10 +2,10 @@
     NecroticCommander
 
     TODO:
+    Fix cursor targeting
     Attack animations
     Add waves of enemies
     Add Knights to embolden the peasants
-    Actually decide what it does, and implement, "Corpse explosion"
     Introduction to set the scene
     Polish UI
 */
@@ -15,10 +15,19 @@
 // popup errors if there are any (help diagnose issues on mobile devices)
 // onerror = (...parameters)=> alert(parameters);
 
+showWatermark = 0;
+
 let levelSize, tileLayer, cursor, necromancer;
 let summonButton, explosionButton, netherBoltButton, drainSoulButton;
 let summons, enemies, graves;
 let hudHeight, endTime, screenShake;
+
+const Scene = {
+    Intro: 'Intro',
+    Game: 'Game'
+}
+
+let currentScreen = Scene.Intro;
 
 function startGame() {
     necromancer = new Necromancer(vec2(levelSize.x / 2, 22));
@@ -28,10 +37,10 @@ function startGame() {
     endTime = 1;
     screenShake = 0;
 
-    explosionButton = new CorpseBombButton(vec2(levelSize.x - 20, 4))
-    summonButton = new RaiseDeadButton(vec2(levelSize.x - 8, 10))
-    netherBoltButton = new NetherBoltButton(vec2(levelSize.x - 20, 10))
-    drainSoulButton = new DrainSoulButton(vec2(levelSize.x - 8, 4))
+    explosionButton = new CorpseBombButton(vec2(levelSize.x - 19.5, 4))
+    summonButton = new RaiseDeadButton(vec2(levelSize.x - 7.5, 10))
+    netherBoltButton = new NetherBoltButton(vec2(levelSize.x - 19.5, 10))
+    drainSoulButton = new DrainSoulButton(vec2(levelSize.x - 7.5, 4))
 
     graves = [];
     enemies = [];
@@ -82,7 +91,9 @@ function gameInit() {
 
 /// ////////////////////////////////////////////////////////////////////////////
 function gameUpdate() {
-
+    if (currentScreen === Scene.Intro) {
+        paused = true;
+    }
 }
 
 /// ////////////////////////////////////////////////////////////////////////////
@@ -105,7 +116,7 @@ function gameUpdatePost() {
         if (endTime <= 0) {
             paused = true;
         }
-        if (mouseIsDown(0) || gamepadIsDown(0)) {
+        if (paused && (mouseIsDown(0) || gamepadIsDown(0))) {
             paused = false;
             tearDown();
             gameInit();
@@ -115,6 +126,15 @@ function gameUpdatePost() {
 
 /// ////////////////////////////////////////////////////////////////////////////
 function gameRender() {
+    if (currentScreen === Scene.Intro) {
+        if (mouseIsDown(0) || gamepadIsDown(0)) {
+            currentScreen = Scene.Game;
+            paused = false;
+        }
+        return;
+    }
+
+
     const font = new FontImage();
     drawRect( cameraPos,  levelSize, new Color(0, .1, .1), 0, false);
 
@@ -143,6 +163,14 @@ function gameRender() {
 /// ////////////////////////////////////////////////////////////////////////////
 function gameRenderPost() {
     const font = new FontImage();
+    if (currentScreen === Scene.Intro) {
+        drawRect( cameraPos,  levelSize, new Color(0, 0, 0), 0, true);
+        font.drawText("Necro\nCommander", vec2(cameraPos.x, cameraPos.y + 24), 0.6, true);
+        font.drawText("Click to Begin", vec2(cameraPos.x, cameraPos.y), 0.4, true);
+
+        return;
+    }
+
     if (necromancer.health === 0 && endTime <= 0) {
         drawRect(vec2(cameraPos.x, cameraPos.y + 10), vec2(35, 25), new Color(0, 0, 0), 0, true);
         font.drawText("YOUR REIGN\nHAS ENDED\n\nClick to\nretry", vec2(cameraPos.x, cameraPos.y + 18), 0.4, true);

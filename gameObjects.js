@@ -274,10 +274,21 @@ class Summon extends Unit {
 class Enemy extends Unit {
     constructor(pos, tile) {
         super(pos, tile);
+        this.beingDrained = false;
+
+        /*this.addChild(new ParticleEmitter(
+            vec2(0, 0), 0, objectDefaultSize, 0, 4, 0,  // pos, angle, emitSize, emitTime, emitRate, emiteCone
+            0, tileSizeDefault,                              // tileIndex, tileSize
+            new Color(0, 1, 1), new Color(0, 0, 0),   // colorStartA, colorStartB
+            new Color(0, 1, 1, 0), new Color(0, 0, 0, 0), // colorEndA, colorEndB
+            2, 0.5, .2, .1, .05,  // particleTime, sizeStart, sizeEnd, particleSpeed, particleAngleSpeed
+            .99, 1, 1, PI, .05,  // damping, angleDamping, gravityScale, particleCone, fadeRate,
+            .5, 0                // randomness, collide, additive, randomColorLinear, renderOrder
+        ), vec2(0, 0), PI);*/
+
     }
 
     collideWithObject(o) {
-        this.color = new Color(1, 1, 1);
         if (o instanceof Enemy) {
             this.target = undefined;
             return true;
@@ -287,11 +298,24 @@ class Enemy extends Unit {
         } else if (isClicked(o) &&
             drainSoulButton.selected &&
             necromancer.mana < 100) {
-            this.health -= 1 * timeDelta;
-            necromancer.mana += 5 * timeDelta;
+
+            enemies.forEach((e) => {
+                e.beingDrained = false
+                e.color = new Color(1, 1, 1);
+            });
+
+            this.beingDrained = true;
             this.color = new Color(0, 1, 1);
+
             return false;
         }
+
+        if (this.beingDrained) {
+            this.health -= 1 * timeDelta;
+            necromancer.mana += 5 * timeDelta;
+            return false;
+        }
+
         return false;
     }
 }
