@@ -31,16 +31,16 @@ let currentScreen = Scene.Intro;
 
 function startGame() {
     necromancer = new Necromancer(vec2(levelSize.x / 2, 22));
-    cursor = new Cursor(vec2(levelSize.x / 2, levelSize.y / 2))
+    cursor = new Cursor(vec2(levelSize.x / 2, levelSize.y / 2));
 
     hudHeight = 15;
     endTime = 1;
     screenShake = 0;
 
-    explosionButton = new CorpseBombButton(vec2(levelSize.x - 19.5, 4))
-    summonButton = new RaiseDeadButton(vec2(levelSize.x - 7.5, 10))
-    netherBoltButton = new NetherBoltButton(vec2(levelSize.x - 19.5, 10))
-    drainSoulButton = new DrainSoulButton(vec2(levelSize.x - 7.5, 4))
+    explosionButton = new CorpseBombButton(vec2(levelSize.x - 19.5, 4));
+    summonButton = new RaiseDeadButton(vec2(levelSize.x - 7.5, 10));
+    netherBoltButton = new NetherBoltButton(vec2(levelSize.x - 19.5, 10));
+    drainSoulButton = new DrainSoulButton(vec2(levelSize.x - 7.5, 4));
 
     graves = [];
     enemies = [];
@@ -92,7 +92,7 @@ function gameInit() {
 /// ////////////////////////////////////////////////////////////////////////////
 function gameUpdate() {
     if (currentScreen === Scene.Intro) {
-        paused = true;
+        //paused = true;
     }
 }
 
@@ -129,7 +129,7 @@ function gameRender() {
     if (currentScreen === Scene.Intro) {
         if (mouseIsDown(0) || gamepadIsDown(0)) {
             currentScreen = Scene.Game;
-            paused = false;
+            //paused = false;
         }
         return;
     }
@@ -165,9 +165,9 @@ function gameRenderPost() {
     const font = new FontImage();
     if (currentScreen === Scene.Intro) {
         drawRect( cameraPos,  levelSize, new Color(0, 0, 0), 0, true);
-        font.drawText("Necro\nCommander", vec2(cameraPos.x, cameraPos.y + 24), 0.6, true);
+        font.drawText("Necrotic\nCommander", vec2(cameraPos.x, cameraPos.y + 24), 0.6, true);
         font.drawText("Click to Begin", vec2(cameraPos.x, cameraPos.y), 0.4, true);
-
+        drawTile(vec2(cameraPos.x, cameraPos.y + 8 + Math.sin(timeReal)), vec2(8), 18, tileSizeDefault, new Color(1,1,1), 0, 0, new Color(0,0,0,0), true);
         return;
     }
 
