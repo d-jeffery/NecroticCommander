@@ -2,11 +2,10 @@
     NecroticCommander
 
     TODO:
-    Fix cursor targeting
+    Fix cursor rendering
     Attack animations
     Add waves of enemies
     Add Knights to embolden the peasants
-    Introduction to set the scene
 */
 
 'use strict';
@@ -83,7 +82,7 @@ function gameInit() {
     levelSize = vec2(44, 80);
     cameraPos = levelSize.scale(0.5);
     cameraScale = 16;
-
+    cursor = new Cursor(vec2(levelSize.x / 2, levelSize.y / 2));
 }
 
 /// ////////////////////////////////////////////////////////////////////////////
@@ -123,14 +122,12 @@ function gameUpdatePost() {
     if (necromancer.health <= 0) {
         endTime -= timeDelta;
         necromancer.health = 0;
-        necromancer.destroy()
-        if (endTime <= 0) {
-            paused = true;
-        }
-        if (paused && (mouseIsDown(0) || gamepadIsDown(0))) {
-            paused = false;
+        necromancer.destroy();
+        cursor.destroy();
+        if (endTime <= 0 && (mouseIsDown(0) || gamepadIsDown(0))) {
             tearDown();
             gameInit();
+            startGame();
         }
     }
 }
@@ -143,22 +140,22 @@ function gameRender() {
     if (currentScreen === Scene.Intro) {
         drawRect( cameraPos, levelSize, new Color(0, 0, 0), 0, true);
         font.drawText("Necrotic\nCommander", vec2(cameraPos.x, cameraPos.y + 24), 0.6, true);
-        font.drawText("Click to Begin", vec2(cameraPos.x, cameraPos.y - 10), 0.4, true);
-        drawTile(vec2(cameraPos.x, cameraPos.y + 8 + Math.sin(timeReal)), vec2(8), 18, tileSizeDefault, new Color(1,1,1), 0, 0, new Color(0,0,0,0), true);
+        drawTile(vec2(cameraPos.x, cameraPos.y + 2 + Math.sin(timeReal)), vec2(12), 18, tileSizeDefault, new Color(1,1,1), 0, 0, new Color(0,0,0,0), true);
+        font.drawText("Click to Start", vec2(cameraPos.x, cameraPos.y - 10), 0.4, true);
         return;
     } else if (currentScreen === Scene.Help) {
         drawRect( cameraPos, levelSize, new Color(0, 0, 0), 0, true);
         font.drawText("You are the\nNecrotic Commander", vec2(cameraPos.x, cameraPos.y + 36), 0.2, true);
         drawTile(vec2(cameraPos.x, cameraPos.y + 26), vec2(8), 10, tileSizeDefault, new Color(1,1,1), 0, 0, new Color(0,0,0,0), true);
         font.drawText("An ancient master of death\nand decay, with the power\nto reanimate the dead to do\nyour bidding.", vec2(cameraPos.x, cameraPos.y + 18), 0.2, true);
-        font.drawText("Despite you're warnings the\nlocal peasantry seek to\ndethrone you.", vec2(cameraPos.x, cameraPos.y + 10), 0.2, true);
-        font.drawText("Using your dark arts destroy\ntheir pitiful uprising,\n and send them to their graves.", vec2(cameraPos.x, cameraPos.y + 4), 0.2, true);
+        font.drawText("Despite your warnings the\nlocal peasantry seek to\ndethrone you.", vec2(cameraPos.x, cameraPos.y + 10), 0.2, true);
+        font.drawText("Use the dark arts at your\ndisposal to send them\nto an early grave!", vec2(cameraPos.x, cameraPos.y + 4), 0.2, true);
 
         drawRect(vec2(cameraPos.x, cameraPos.y - 16), vec2(40, 26), new Color(0, 0, 1), 0, true);
 
         font.drawText("Nether Bolt:\nThrow a flaming orb\n of dark energy", vec2(cameraPos.x, cameraPos.y - 4), 0.2, true);
         font.drawText("Raise Dead:\nBring a resting\ncorpse back to life", vec2(cameraPos.x, cameraPos.y - 10), 0.2, true);
-        font.drawText("Corpse Bomb:\nTurn a minion\ninto a shambling bomb", vec2(cameraPos.x, cameraPos.y - 16), 0.2, true);
+        font.drawText("Corpse Bomb:\nTurn a shambling minion\ninto a bomb", vec2(cameraPos.x, cameraPos.y - 16), 0.2, true);
         font.drawText("Drain Soul:\nAbsorb an enemies\nlife-force for mana", vec2(cameraPos.x, cameraPos.y - 22), 0.2, true);
 
         font.drawText("Click to Begin", vec2(cameraPos.x, cameraPos.y - 32), 0.2, true);

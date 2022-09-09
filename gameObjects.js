@@ -383,7 +383,7 @@ class Bolt extends EngineObject {
 // Cursor
 class Cursor extends EngineObject {
     constructor(pos) {
-        super(pos, vec2(2), 1, vec2(16), 0);
+        super(pos, vec2(1), -1, vec2(16), 0, new Color(0,0,0,0));
         this.setCollision(1, 1);
 
         this.addChild(new ParticleEmitter(
@@ -394,7 +394,7 @@ class Cursor extends EngineObject {
             2, 0.5, .2, .1, .05,  // particleTime, sizeStart, sizeEnd, particleSpeed, particleAngleSpeed
             .99, 1, 1, PI, .05,  // damping, angleDamping, gravityScale, particleCone, fadeRate,
             .5, 0                // randomness, collide, additive, randomColorLinear, renderOrder
-        ), vec2(0, -0.5), PI);
+        ), vec2(0.5, -2), PI);
 
         this.renderOrder = 20
     }
