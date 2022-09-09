@@ -35,7 +35,7 @@ function checkOverlap(r, bombPos, rectPos, rectSize) {
 
 function doExplosion(bomb) {
     [...enemies, ...summons].filter((e) => {
-        if (checkOverlap(10, bomb.pos, e.pos, e.size)) {
+        if (checkOverlap(8, bomb.pos, e.pos, e.size)) {
             e.health -= 50;
 
             const angle = e.pos.subtract(bomb.pos);
