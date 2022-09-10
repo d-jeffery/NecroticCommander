@@ -612,7 +612,7 @@ class Button extends EngineObject {
         drawRect(vec2(this.pos.x, this.pos.y), vec2(11, 5), this.backgroundColor, 0, false);
         drawRect(vec2(this.pos.x, this.pos.y), vec2(10, 4), this.color, 0, false);
         this.font.drawText(this.text, vec2(this.pos.x, this.pos.y + 1.5), 0.2, true);
-        this.font.drawText(this.number.toString(), vec2(this.pos.x - 5, this.pos.y - 1), 0.2, true);
+        this.font.drawText(this.number.toString(), vec2(this.pos.x + 5, this.pos.y - 1), 0.2, true);
     }
 
     collideWithObject(o) {
