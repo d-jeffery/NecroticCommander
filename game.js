@@ -430,6 +430,7 @@ class Unit extends EngineObject {
 class Summon extends Unit {
     constructor(pos) {
         super(pos, Math.round(rand(3, 5)));
+        this.health = 150;
     }
 
     update() {
