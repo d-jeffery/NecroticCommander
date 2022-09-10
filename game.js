@@ -6,6 +6,7 @@
     Attack animations
     Add waves of enemies
     Add Knights to embolden the peasants
+    Button select for gamepad
 */
 
 'use strict';
@@ -19,6 +20,7 @@ let levelSize, tileLayer, cursor, necromancer;
 let summonButton, explosionButton, netherBoltButton, drainSoulButton;
 let summons, enemies, graves;
 let hudHeight, endTime, screenShake;
+let enemyWave, spawnTimer;
 
 const Scene = {
     Intro: 'Intro',
@@ -45,9 +47,8 @@ function startGame() {
     enemies = [];
     summons = [];
 
-    for(let i = -15; i < 17; i += 6) {
-        enemies.push(new Peasant(vec2(cameraPos.x + i, cameraPos.y + 34)))
-    }
+    enemyWave = 0;
+    spawnTimer = new Timer();
 
     for(let i = -18; i < 20; i += 6) {
         for(let j = -18; j < 20; j += 6) {
@@ -109,6 +110,15 @@ function gameUpdate() {
         } else if (keyIsDown(52))  {
             explosionButton.doSelect();
         }
+
+        if (!enemies.length && spawnTimer.elapsed()) {
+            enemyWave++;
+            for(let e = 0; e < enemyWave; e++) {
+                enemies.push(new Peasant(vec2(rand(cameraPos.x - 15, cameraPos.x + 15), cameraPos.y + 42)))
+            }
+        } else if (!spawnTimer.active()) {
+            spawnTimer.set(2);
+        }
     }
 }
 
@@ -161,12 +171,12 @@ function gameRender() {
         font.drawText("Despite your warnings the\nlocal peasantry seek to\ndethrone you.", vec2(cameraPos.x, cameraPos.y + 10), 0.2, true);
         font.drawText("Use the dark arts at your\ndisposal to send them\nto an early grave!", vec2(cameraPos.x, cameraPos.y + 4), 0.2, true);
 
-        drawRect(vec2(cameraPos.x, cameraPos.y - 16), vec2(40, 26), new Color(0, 0, 1), 0, true);
-
-        font.drawText("Nether Bolt:\nThrow a flaming orb\n of dark energy", vec2(cameraPos.x, cameraPos.y - 4), 0.2, true);
-        font.drawText("Raise Dead:\nBring a resting\ncorpse back to life", vec2(cameraPos.x, cameraPos.y - 10), 0.2, true);
-        font.drawText("Corpse Bomb:\nTurn a shambling minion\ninto a bomb", vec2(cameraPos.x, cameraPos.y - 16), 0.2, true);
-        font.drawText("Drain Soul:\nAbsorb an enemies\nlife-force for mana", vec2(cameraPos.x, cameraPos.y - 22), 0.2, true);
+        // drawRect(vec2(cameraPos.x, cameraPos.y - 16), vec2(40, 26), new Color(0, 0, 1), 0, true);
+        //
+        // font.drawText("Nether Bolt:\nThrow a flaming orb\n of dark energy", vec2(cameraPos.x, cameraPos.y - 4), 0.2, true);
+        // font.drawText("Raise Dead:\nBring a resting\ncorpse back to life", vec2(cameraPos.x, cameraPos.y - 10), 0.2, true);
+        // font.drawText("Corpse Bomb:\nTurn a shambling minion\ninto a bomb", vec2(cameraPos.x, cameraPos.y - 16), 0.2, true);
+        // font.drawText("Drain Soul:\nAbsorb an enemies\nlife-force for mana", vec2(cameraPos.x, cameraPos.y - 22), 0.2, true);
 
         font.drawText("Click to Begin", vec2(cameraPos.x, cameraPos.y - 32), 0.2, true);
 
@@ -206,9 +216,9 @@ function gameRenderPost() {
     const font = new FontImage();
     if (necromancer.health === 0 && endTime <= 0) {
         drawRect(vec2(cameraPos.x, cameraPos.y + 10), vec2(35, 25), new Color(0, 0, 0), 0, true);
-        font.drawText("YOUR REIGN\nHAS ENDED\n\nClick to\nretry", vec2(cameraPos.x, cameraPos.y + 18), 0.4, true);
+        font.drawText("YOUR REIGN\nHAS ENDED\n\nClick to\nplay again", vec2(cameraPos.x, cameraPos.y + 18), 0.4, true);
     }
-}
+}1
 
 
 function checkOverlap(r, bombPos, rectPos, rectSize) {
@@ -230,7 +240,7 @@ function checkOverlap(r, bombPos, rectPos, rectSize) {
 function doExplosion(bomb) {
     [...enemies, ...summons].filter((e) => {
         if (checkOverlap(8, bomb.pos, e.pos, e.size)) {
-            e.health -= 50;
+            e.health -= 100;
 
             const angle = e.pos.subtract(bomb.pos);
             e.applyForce(angle.normalize().scale(20));
@@ -363,7 +373,7 @@ class Unit extends EngineObject {
         this.friction = 0.9;
         this.mass = 10;
         this.elasticity = 0.5;
-        this.maxVelocity = rand(0.08, 0.12);
+        this.maxVelocity = rand(0.08, 0.1);
 
         this.target = undefined;
         this.health = 100;
@@ -473,7 +483,10 @@ class Enemy extends Unit {
 
         if (this.beingDrained) {
             this.health -= 1 * timeDelta;
-            necromancer.mana += 5 * timeDelta;
+
+            if (necromancer.mana < 100) {
+                necromancer.mana += 10 * timeDelta;
+            }
             return false;
         }
     }
@@ -531,8 +544,10 @@ class Peasant extends Enemy {
             })
 
             this.target = closest;
-        } else {
+        } else if (necromancer.health > 0) {
             this.target = necromancer.pos;
+        } else {
+            this.target = undefined;
         }
 
         if (this.target) {
