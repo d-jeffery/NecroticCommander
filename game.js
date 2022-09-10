@@ -7,6 +7,7 @@
     Add waves of enemies
     Add Knights to embolden the peasants
     Button select for gamepad
+    Scoreboard
 */
 
 'use strict';
@@ -383,7 +384,7 @@ class Unit extends EngineObject {
 
     update() {
         super.update();
-        if (this.health < 0) {
+        if (this.health <= 0) {
             particleExplode(new Color(1, 0, 0), new Color(0, 0, 0), this.pos, this.size);
             this.destroy();
         }
