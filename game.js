@@ -4,9 +4,9 @@
     TODO:
     Fix cursor rendering
     Attack animations
-    Add waves of enemies
     Add Knights to embolden the peasants
     Button select for gamepad
+    Easier touch controls
     Scoreboard
 */
 
@@ -114,7 +114,7 @@ function gameUpdate() {
 
         if (!enemies.length && spawnTimer.elapsed()) {
             enemyWave++;
-            for(let e = 0; e < enemyWave; e++) {
+            for (let e = 0; e < enemyWave; e++) {
                 enemies.push(new Peasant(vec2(rand(cameraPos.x - 15, cameraPos.x + 15), cameraPos.y + 42)))
             }
         } else if (!spawnTimer.active()) {
@@ -179,7 +179,7 @@ function gameRender() {
         // font.drawText("Corpse Bomb:\nTurn a shambling minion\ninto a bomb", vec2(cameraPos.x, cameraPos.y - 16), 0.2, true);
         // font.drawText("Drain Soul:\nAbsorb an enemies\nlife-force for mana", vec2(cameraPos.x, cameraPos.y - 22), 0.2, true);
 
-        font.drawText("Click to Begin", vec2(cameraPos.x, cameraPos.y - 32), 0.2, true);
+        // font.drawText("Click to Begin", vec2(cameraPos.x, cameraPos.y - 32), 0.2, true);
 
         return;
     }
@@ -216,11 +216,10 @@ function gameRenderPost() {
 
     const font = new FontImage();
     if (necromancer.health === 0 && endTime <= 0) {
-        drawRect(vec2(cameraPos.x, cameraPos.y + 10), vec2(35, 25), new Color(0, 0, 0), 0, true);
-        font.drawText("YOUR REIGN\nHAS ENDED\n\nClick to\nplay again", vec2(cameraPos.x, cameraPos.y + 18), 0.4, true);
+        drawRect(vec2(cameraPos.x, cameraPos.y + 10), vec2(40, 35), new Color(0, 0, 0), 0, true);
+        font.drawText(`YOUR REIGN\nHAS ENDED\n\nYou lasted\nto wave ${enemyWave}!\n\nClick to\nplay again`, vec2(cameraPos.x, cameraPos.y + 23), 0.4, true);
     }
-}1
-
+}
 
 function checkOverlap(r, bombPos, rectPos, rectSize) {
     const circleDistanceX = abs(bombPos.x - rectPos.x);
