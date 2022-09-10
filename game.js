@@ -64,7 +64,7 @@ function makeTileLayers(size) {
     tileLayer.renderOrder = 10;
 
     for(let pos = vec2(5, hudHeight); pos.y < size.y; pos.y++) {
-        tileLayer.setData(pos, new TileLayerData(16));
+        tileLayer.setData(pos, new TileLayerData(12));
     }
 
     tileLayer.redraw();
@@ -140,7 +140,7 @@ function gameRender() {
     if (currentScreen === Scene.Intro) {
         drawRect( cameraPos, levelSize, new Color(0, 0, 0), 0, true);
         font.drawText("Necrotic\nCommander", vec2(cameraPos.x, cameraPos.y + 24), 0.6, true);
-        drawTile(vec2(cameraPos.x, cameraPos.y + 2 + Math.sin(timeReal)), vec2(12), 18, tileSizeDefault, new Color(1,1,1), 0, 0, new Color(0,0,0,0), true);
+        drawTile(vec2(cameraPos.x, cameraPos.y + 2 + Math.sin(timeReal)), vec2(12), 1, tileSizeDefault, new Color(1,1,1), 0, 0, new Color(0,0,0,0), true);
         font.drawText("Click to Start", vec2(cameraPos.x, cameraPos.y - 10), 0.4, true);
         return;
     } else if (currentScreen === Scene.Help) {
@@ -272,7 +272,7 @@ class Necromancer extends EngineObject {
         this.generationTime = 0;
         this.boltThrowTime = 0;
 
-        const castle = new EngineObject(this.pos, vec2(5), 17, tileSizeDefault, 0, new Color, 15);
+        const castle = new EngineObject(this.pos, vec2(5), 13, tileSizeDefault, 0, new Color, 15);
         this.addChild(castle, vec2(0, -3))
     }
 
@@ -593,8 +593,6 @@ class Cursor extends EngineObject {
             this.pos.x = mousePos.x;
             this.pos.y = mousePos.y;
         }
-        this.pos.x = clamp(this.pos.x, this.size.x / 2, levelSize.x - this.size.x / 2);
-        this.pos.y = clamp(this.pos.y, this.size.y / 2, levelSize.y - this.size.y / 2)
     }
 }
 
