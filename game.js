@@ -36,10 +36,10 @@ function startGame() {
     endTime = 1;
     screenShake = 0;
 
-    explosionButton = new CorpseBombButton(vec2(levelSize.x - 19.5, 4));
-    summonButton = new RaiseDeadButton(vec2(levelSize.x - 7.5, 10));
     netherBoltButton = new NetherBoltButton(vec2(levelSize.x - 19.5, 10));
-    drainSoulButton = new DrainSoulButton(vec2(levelSize.x - 7.5, 4));
+    drainSoulButton = new DrainSoulButton(vec2(levelSize.x - 7.5, 10));
+    summonButton = new RaiseDeadButton(vec2(levelSize.x - 19.5, 4));
+    explosionButton = new CorpseBombButton(vec2(levelSize.x - 7.5, 4));
 
     graves = [];
     enemies = [];
@@ -98,6 +98,16 @@ function gameUpdate() {
             makeTileLayers(levelSize);
 
             startGame();
+        }
+    } else if (currentScreen === Scene.Game) {
+        if (keyIsDown(49)) {
+            netherBoltButton.doSelect();
+        } else if (keyIsDown(50))  {
+            drainSoulButton.doSelect();
+        } else if (keyIsDown(51))  {
+            summonButton.doSelect();
+        } else if (keyIsDown(52))  {
+            explosionButton.doSelect();
         }
     }
 }
@@ -266,7 +276,7 @@ class Necromancer extends EngineObject {
     constructor(pos) {
         super(pos, vec2(4), 10);
         this.setCollision(1, 1)
-        this.renderOrder = 10
+        this.renderOrder = 5
         this.health = 100;
         this.mana = manaPool;
         this.generationTime = 0;
@@ -358,7 +368,7 @@ class Unit extends EngineObject {
         this.target = undefined;
         this.health = 100;
 
-        this.renderOrder = 1;
+        this.renderOrder = 10;
     }
 
     update() {
@@ -378,10 +388,7 @@ class Unit extends EngineObject {
         this.moveTowardsTarget();
     }
 
-    moveTowardsTarget(moveAlg) {
-        if (moveAlg === undefined) {
-            moveAlg = (p) => p
-        }
+    moveTowardsTarget() {
 
         if (abs(this.pos.x - this.target.x) < 0.1 &&
             abs(this.pos.y - this.target.y) < 0.1) {
@@ -459,17 +466,16 @@ class Enemy extends Unit {
     constructor(pos, tile) {
         super(pos, tile);
         this.beingDrained = false;
+    }
 
-        /*this.addChild(new ParticleEmitter(
-            vec2(0, 0), 0, objectDefaultSize, 0, 4, 0,  // pos, angle, emitSize, emitTime, emitRate, emiteCone
-            0, tileSizeDefault,                              // tileIndex, tileSize
-            new Color(0, 1, 1), new Color(0, 0, 0),   // colorStartA, colorStartB
-            new Color(0, 1, 1, 0), new Color(0, 0, 0, 0), // colorEndA, colorEndB
-            2, 0.5, .2, .1, .05,  // particleTime, sizeStart, sizeEnd, particleSpeed, particleAngleSpeed
-            .99, 1, 1, PI, .05,  // damping, angleDamping, gravityScale, particleCone, fadeRate,
-            .5, 0                // randomness, collide, additive, randomColorLinear, renderOrder
-        ), vec2(0, 0), PI);*/
+    update() {
+        super.update();
 
+        if (this.beingDrained) {
+            this.health -= 1 * timeDelta;
+            necromancer.mana += 5 * timeDelta;
+            return false;
+        }
     }
 
     collideWithObject(o) {
@@ -480,8 +486,7 @@ class Enemy extends Unit {
             this.attack(o, 1)
             return true;
         } else if (isClicked(o) &&
-            drainSoulButton.selected &&
-            necromancer.mana < 100) {
+            drainSoulButton.selected) {
 
             enemies.forEach((e) => {
                 e.beingDrained = false
@@ -491,12 +496,6 @@ class Enemy extends Unit {
             this.beingDrained = true;
             this.color = new Color(0, 1, 1);
 
-            return false;
-        }
-
-        if (this.beingDrained) {
-            this.health -= 1 * timeDelta;
-            necromancer.mana += 5 * timeDelta;
             return false;
         }
 
@@ -570,16 +569,6 @@ class Cursor extends EngineObject {
         super(pos, vec2(1), -1, vec2(16), 0, new Color(0,0,0,0));
         this.setCollision(1, 1);
 
-        this.addChild(new ParticleEmitter(
-            vec2(0, 0), 0, objectDefaultSize, 0, 4, 0,  // pos, angle, emitSize, emitTime, emitRate, emiteCone
-            0, tileSizeDefault,                              // tileIndex, tileSize
-            new Color(1, 0, 0), new Color(0, 0, 0),   // colorStartA, colorStartB
-            new Color(1, 0, 0, 0), new Color(0, 0, 0, 0), // colorEndA, colorEndB
-            2, 0.5, .2, .1, .05,  // particleTime, sizeStart, sizeEnd, particleSpeed, particleAngleSpeed
-            .99, 1, 1, PI, .05,  // damping, angleDamping, gravityScale, particleCone, fadeRate,
-            .5, 0                // randomness, collide, additive, randomColorLinear, renderOrder
-        ), vec2(0.5, -2), PI);
-
         this.renderOrder = 20
     }
 
@@ -593,14 +582,17 @@ class Cursor extends EngineObject {
             this.pos.x = mousePos.x;
             this.pos.y = mousePos.y;
         }
+        this.pos.x = clamp(this.pos.x, this.size.x / 2, levelSize.x - this.size.x / 2);
+        this.pos.y = clamp(this.pos.y, this.size.y / 2, levelSize.y - this.size.y / 2)
     }
 }
 
 // Buttons
 class Button extends EngineObject {
-    constructor(pos, text, color, backgroundColor) {
+    constructor(pos, text, number, color, backgroundColor) {
         super(pos, vec2(11, 5));
         this.text = text;
+        this.number = number;
         this.color = color;
         this.backgroundColor = backgroundColor;
         this.selected = false;
@@ -620,45 +612,52 @@ class Button extends EngineObject {
         drawRect(vec2(this.pos.x, this.pos.y), vec2(11, 5), this.backgroundColor, 0, false);
         drawRect(vec2(this.pos.x, this.pos.y), vec2(10, 4), this.color, 0, false);
         this.font.drawText(this.text, vec2(this.pos.x, this.pos.y + 1.5), 0.2, true);
+        this.font.drawText(this.number.toString(), vec2(this.pos.x - 5, this.pos.y - 1), 0.2, true);
     }
 
     collideWithObject(o) {
         if (isOverlapping(cursor.pos, cursor.size, this.pos, this.size) && isDown()) {
-            engineObjects.forEach((obj) => {
-                if (obj instanceof Button) {
-                    obj.selected = false;
-                }
-            })
-            this.selected = true;
+            this.doSelect();
         }
         return false;
     }
-}
 
-class RaiseDeadButton extends Button {
-    constructor(pos) {
-        super(pos, "Raise\nDead", new Color(1, 0, 0), new Color(0.5, 0, 0));
+    doSelect() {
+        engineObjects.forEach((obj) => {
+            if (obj instanceof Button) {
+                obj.selected = false;
+            }
+        })
+        this.selected = true;
     }
 }
 
-class CorpseBombButton extends Button {
-    constructor(pos) {
-        super(pos, "Corpse\nBomb", new Color(1, 0, 0), new Color(0.5, 0, 0));
-    }
-}
 
 class NetherBoltButton extends Button {
     constructor(pos) {
-        super(pos, "Nether\nBolt", new Color(1, 0, 0), new Color(0.5, 0, 0));
+        super(pos, "Nether\nBolt", 1, new Color(1, 0, 0), new Color(0.5, 0, 0));
         this.selected = true;
     }
 }
 
 class DrainSoulButton extends Button {
     constructor(pos) {
-        super(pos, "Drain\nSoul", new Color(1, 0, 0), new Color(0.5, 0, 0));
+        super(pos, "Drain\nSoul", 2, new Color(1, 0, 0), new Color(0.5, 0, 0));
     }
 }
+
+class RaiseDeadButton extends Button {
+    constructor(pos) {
+        super(pos, "Raise\nDead", 3, new Color(1, 0, 0), new Color(0.5, 0, 0));
+    }
+}
+
+class CorpseBombButton extends Button {
+    constructor(pos) {
+        super(pos, "Corpse\nBomb", 4, new Color(1, 0, 0), new Color(0.5, 0, 0));
+    }
+}
+
 
 /// ////////////////////////////////////////////////////////////////////////////
 // Startup LittleJS Engine
