@@ -18,14 +18,14 @@ showWatermark = 0;
 
 let levelSize, tileLayer, cursor, necromancer;
 let summonButton, explosionButton, netherBoltButton, drainSoulButton;
+let tutorialModeButton, endlessModeButton;
 let summons, enemies, graves;
 let hudHeight, endTime, screenShake;
 let enemyWave, spawnTimer;
 
 const Scene = {
-    Intro: 'Intro',
-    Help: 'Help',
-    Game: 'Game'
+    Intro: 0,
+    Game: 1
 }
 
 let currentScreen = Scene.Intro;
@@ -33,6 +33,9 @@ let currentScreen = Scene.Intro;
 const tune = new Music([[[,0,400,,1.5,.3,1,0,,,,,4]],[[[,-1,20,,,20,,,19,,,19,,,12,,,15,,12,,,,12,,,20,,20,,,,19,,,19,,,12,,,,,,,,,,20,,,20,,,19,,,19,,,12,,,15,,,]],[[,,12,,,,,,15,,,17,,,14,,,15,,,12,,,,,,,,,,,,,,,]]],[0,1],,]);
 
 function startGame() {
+    tutorialModeButton.destroy();
+    endlessModeButton.destroy();
+
     necromancer = new Necromancer(vec2(levelSize.x / 2, 22));
     cursor = new Cursor(vec2(levelSize.x / 2, levelSize.y / 2));
 
@@ -87,22 +90,27 @@ function gameInit() {
     cameraScale = 16;
     cursor = new Cursor(vec2(levelSize.x / 2, levelSize.y / 2));
     tune.play(1, 0);
+
+    tutorialModeButton = new TutorialButton(vec2(cameraPos.x - 10, cameraPos.y - 14));
+    endlessModeButton = new EndlessMode(vec2(cameraPos.x + 10, cameraPos.y - 14));
 }
 
 /// ////////////////////////////////////////////////////////////////////////////
 function gameUpdate() {
     if (currentScreen === Scene.Intro) {
-        if (mouseWasPressed(0) || gamepadWasPressed(0)) {
-            currentScreen = Scene.Help;
-        }
-    } else if (currentScreen === Scene.Help) {
-        if (mouseWasPressed(0) || gamepadWasPressed(0)) {
+        if (endlessModeButton.selected) {
             currentScreen = Scene.Game;
 
             makeTileLayers(levelSize);
 
             startGame();
+        } else if (tutorialModeButton.selected) {
+
+            makeTileLayers(levelSize);
+
+            startGame();
         }
+
     } else if (currentScreen === Scene.Game) {
         if (keyIsDown(49)) {
             netherBoltButton.doSelect();
@@ -161,24 +169,15 @@ function gameRender() {
     const font = new FontImage();
 
     if (currentScreen === Scene.Intro) {
-        drawRect( cameraPos, levelSize, new Color(0, 0, 0), 0, true);
+        drawRect( cameraPos, levelSize, new Color(0, 0, 0), 0, false);
         font.drawText("Necrotic\nCommander", vec2(cameraPos.x, cameraPos.y + 24), 0.6, true);
         drawTile(vec2(cameraPos.x, cameraPos.y + 2 + Math.sin(timeReal)), vec2(12), 1, tileSizeDefault, new Color(1,1,1), 0, 0, new Color(0,0,0,0), true);
-        font.drawText("Click to Start", vec2(cameraPos.x, cameraPos.y - 10), 0.4, true);
         return;
-    } else if (currentScreen === Scene.Help) {
-        drawRect( cameraPos, levelSize, new Color(0, 0, 0), 0, true);
-        font.drawText("You are the\nNecrotic Commander", vec2(cameraPos.x, cameraPos.y + 20), 0.2, true);
-        drawTile(vec2(cameraPos.x, cameraPos.y + 10), vec2(8), 10, tileSizeDefault, new Color(1,1,1), 0, 0, new Color(0,0,0,0), true);
-        font.drawText("An ancient necromancer,\nmaster of death and decay!\n\nYour cemetary is being\ninvaded by peasants.\n\nDestroy their uprising.", vec2(cameraPos.x, cameraPos.y + 2), 0.2, true);
-
+    }
         // font.drawText("Nether Bolt:\nThrow a flaming orb\n of dark energy", vec2(cameraPos.x, cameraPos.y - 4), 0.2, true);
         // font.drawText("Raise Dead:\nBring a resting\ncorpse back to life", vec2(cameraPos.x, cameraPos.y - 10), 0.2, true);
         // font.drawText("Corpse Bomb:\nTurn a shambling minion\ninto a bomb", vec2(cameraPos.x, cameraPos.y - 16), 0.2, true);
         // font.drawText("Drain Soul:\nAbsorb an enemies\nlife-force for mana", vec2(cameraPos.x, cameraPos.y - 22), 0.2, true);
-
-        return;
-    }
 
     drawRect( cameraPos,  levelSize, new Color(0, .1, .1), 0, false);
 
@@ -601,8 +600,8 @@ class Cursor extends EngineObject {
 
 // Buttons
 class Button extends EngineObject {
-    constructor(pos, text, number, color, backgroundColor) {
-        super(pos, vec2(11, 5));
+    constructor(pos, size, text, number, color, backgroundColor) {
+        super(pos, size);
         this.text = text;
         this.number = number;
         this.color = color;
@@ -621,10 +620,12 @@ class Button extends EngineObject {
             this.backgroundColor = new Color(0.5, 0, 0);
         }
 
-        drawRect(vec2(this.pos.x, this.pos.y), vec2(11, 5), this.backgroundColor, 0, false);
-        drawRect(vec2(this.pos.x, this.pos.y), vec2(10, 4), this.color, 0, false);
+        drawRect(vec2(this.pos.x, this.pos.y), this.size, this.backgroundColor, 0, false);
+        drawRect(vec2(this.pos.x, this.pos.y), vec2(this.size.x - 1, this.size.y - 1), this.color, 0, false);
         this.font.drawText(this.text, vec2(this.pos.x, this.pos.y + 1.5), 0.2, true);
-        this.font.drawText(this.number.toString(), vec2(this.pos.x + 5, this.pos.y - 1), 0.2, true);
+        if (this.number > -1) {
+            this.font.drawText(this.number.toString(), vec2(this.pos.x + 5, this.pos.y - 1), 0.2, true);
+        }
     }
 
     collideWithObject(o) {
@@ -647,26 +648,38 @@ class Button extends EngineObject {
 
 class NetherBoltButton extends Button {
     constructor(pos) {
-        super(pos, "Nether\nBolt", 1, new Color(1, 0, 0), new Color(0.5, 0, 0));
+        super(pos, vec2(11, 5), "Nether\nBolt", 1, new Color(1, 0, 0), new Color(0.5, 0, 0));
         this.selected = true;
     }
 }
 
 class DrainSoulButton extends Button {
     constructor(pos) {
-        super(pos, "Drain\nSoul", 2, new Color(1, 0, 0), new Color(0.5, 0, 0));
+        super(pos, vec2(11, 5), "Drain\nSoul", 2, new Color(1, 0, 0), new Color(0.5, 0, 0));
     }
 }
 
 class RaiseDeadButton extends Button {
     constructor(pos) {
-        super(pos, "Raise\nDead", 3, new Color(1, 0, 0), new Color(0.5, 0, 0));
+        super(pos, vec2(11, 5), "Raise\nDead", 3, new Color(1, 0, 0), new Color(0.5, 0, 0));
     }
 }
 
 class CorpseBombButton extends Button {
     constructor(pos) {
-        super(pos, "Corpse\nBomb", 4, new Color(1, 0, 0), new Color(0.5, 0, 0));
+        super(pos, vec2(11, 5), "Corpse\nBomb", 4, new Color(1, 0, 0), new Color(0.5, 0, 0));
+    }
+}
+
+class TutorialButton extends Button {
+    constructor(pos) {
+        super(pos, vec2(15, 8), "Tutorial\nMode", -1, new Color(1, 0, 0), new Color(0.5, 0, 0));
+    }
+}
+
+class EndlessMode extends Button {
+    constructor(pos) {
+        super(pos, vec2(15, 8), "Endless\nMode", -1, new Color(1,0,0), new Color(0.5, 0, 0));
     }
 }
 
