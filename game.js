@@ -166,20 +166,14 @@ function gameRender() {
         return;
     } else if (currentScreen === Scene.Help) {
         drawRect( cameraPos, levelSize, new Color(0, 0, 0), 0, true);
-        font.drawText("You are the\nNecrotic Commander", vec2(cameraPos.x, cameraPos.y + 36), 0.2, true);
-        drawTile(vec2(cameraPos.x, cameraPos.y + 26), vec2(8), 10, tileSizeDefault, new Color(1,1,1), 0, 0, new Color(0,0,0,0), true);
-        font.drawText("An ancient master of death\nand decay, with the power\nto reanimate the dead to do\nyour bidding.", vec2(cameraPos.x, cameraPos.y + 18), 0.2, true);
-        font.drawText("Despite your warnings the\nlocal peasantry seek to\ndethrone you.", vec2(cameraPos.x, cameraPos.y + 10), 0.2, true);
-        font.drawText("Use the dark arts at your\ndisposal to send them\nto an early grave!", vec2(cameraPos.x, cameraPos.y + 4), 0.2, true);
+        font.drawText("You are the\nNecrotic Commander", vec2(cameraPos.x, cameraPos.y + 20), 0.2, true);
+        drawTile(vec2(cameraPos.x, cameraPos.y + 10), vec2(8), 10, tileSizeDefault, new Color(1,1,1), 0, 0, new Color(0,0,0,0), true);
+        font.drawText("An ancient necromancer,\nmaster of death and decay!\n\nYour cemetary is being\ninvaded by peasants.\n\nDestroy their uprising.", vec2(cameraPos.x, cameraPos.y + 2), 0.2, true);
 
-        // drawRect(vec2(cameraPos.x, cameraPos.y - 16), vec2(40, 26), new Color(0, 0, 1), 0, true);
-        //
         // font.drawText("Nether Bolt:\nThrow a flaming orb\n of dark energy", vec2(cameraPos.x, cameraPos.y - 4), 0.2, true);
         // font.drawText("Raise Dead:\nBring a resting\ncorpse back to life", vec2(cameraPos.x, cameraPos.y - 10), 0.2, true);
         // font.drawText("Corpse Bomb:\nTurn a shambling minion\ninto a bomb", vec2(cameraPos.x, cameraPos.y - 16), 0.2, true);
         // font.drawText("Drain Soul:\nAbsorb an enemies\nlife-force for mana", vec2(cameraPos.x, cameraPos.y - 22), 0.2, true);
-
-        // font.drawText("Click to Begin", vec2(cameraPos.x, cameraPos.y - 32), 0.2, true);
 
         return;
     }
@@ -673,7 +667,6 @@ class CorpseBombButton extends Button {
         super(pos, "Corpse\nBomb", 4, new Color(1, 0, 0), new Color(0.5, 0, 0));
     }
 }
-
 
 /// ////////////////////////////////////////////////////////////////////////////
 // Startup LittleJS Engine
