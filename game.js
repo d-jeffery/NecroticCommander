@@ -7,7 +7,6 @@
     Add Knights to embolden the peasants
     Button select for gamepad
     Easier touch controls
-    Scoreboard
 */
 
 'use strict';
@@ -30,6 +29,8 @@ const Scene = {
 }
 
 let currentScreen = Scene.Intro;
+
+const tune = new Music([[[,0,400,,1.5,.3,1,0,,,,,4]],[[[,-1,20,,,20,,,19,,,19,,,12,,,15,,12,,,,12,,,20,,20,,,,19,,,19,,,12,,,,,,,,,,20,,,20,,,19,,,19,,,12,,,15,,,]],[[,,12,,,,,,15,,,17,,,14,,,15,,,12,,,,,,,,,,,,,,,]]],[0,1],,]);
 
 function startGame() {
     necromancer = new Necromancer(vec2(levelSize.x / 2, 22));
@@ -85,6 +86,7 @@ function gameInit() {
     cameraPos = levelSize.scale(0.5);
     cameraScale = 16;
     cursor = new Cursor(vec2(levelSize.x / 2, levelSize.y / 2));
+    tune.play(1, 0);
 }
 
 /// ////////////////////////////////////////////////////////////////////////////
