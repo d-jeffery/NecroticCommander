@@ -8,7 +8,7 @@
     Soul Drain kills and slows
     Refill graves
     highlight with raise dead and corpse bombs
-
+    Refill graves after 10 waves
 */
 
 'use strict';
@@ -522,7 +522,7 @@ class Enemy extends Unit {
         super.update();
 
         if (this.beingDrained) {
-            this.health -= 1 * timeDelta;
+            this.health -= 15 * timeDelta;
 
             if (necromancer.mana < 100) {
                 necromancer.mana += 10 * timeDelta;
