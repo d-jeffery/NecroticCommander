@@ -2,11 +2,13 @@
     NecroticCommander
 
     TODO:
-    Fix cursor rendering
-    Attack animations
-    Add Knights to embolden the peasants
-    Button select for gamepad
     Easier touch controls
+    Check on corpse bomb
+    Fight sounds remove music
+    Soul Drain kills and slows
+    Refill graves
+    highlight with raise dead and corpse bombs
+
 */
 
 'use strict';
@@ -30,8 +32,6 @@ const Scene = {
 }
 
 let currentScreen = Scene.Intro;
-
-const tune = new Music([[[,0,400,,1.5,.3,1,0,,,,,4]],[[[,,20,,,20,,,19,,,19,,,12,,,15,,12,,,,12,,,20,,20,,,,19,,,19,,,12,,,,,,,,,,20,,,20,,,19,,,19,,,12,,,15,,,]],[[,,12,,,,,,15,,,17,,,14,,,15,,,12,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,]]],[0,1],,]);
 
 function startGame() {
     tutorialModeButton.destroy();
@@ -93,8 +93,6 @@ function gameInit() {
 
     tutorialModeButton = new TutorialButton(vec2(cameraPos.x - 10, cameraPos.y - 14));
     endlessModeButton = new EndlessMode(vec2(cameraPos.x + 10, cameraPos.y - 14));
-
-    tune.play(1, 0);
 }
 
 /// ////////////////////////////////////////////////////////////////////////////
