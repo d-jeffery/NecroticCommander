@@ -32,6 +32,7 @@ const Scene = {
 let currentScreen = Scene.Intro;
 
 const tune = new Music([[[,0,400,,1.5,.3,1,0,,,,,4]],[[[,-1,20,,,20,,,19,,,19,,,12,,,15,,12,,,,12,,,20,,20,,,,19,,,19,,,12,,,,,,,,,,20,,,20,,,19,,,19,,,12,,,15,,,]],[[,,12,,,,,,15,,,17,,,14,,,15,,,12,,,,,,,,,,,,,,,]]],[0,1],,]);
+tune.play(1, 0);
 
 function startGame() {
     tutorialModeButton.destroy();
@@ -90,7 +91,6 @@ function gameInit() {
     cameraPos = levelSize.scale(0.5);
     cameraScale = 16;
     cursor = new Cursor(vec2(levelSize.x / 2, levelSize.y / 2));
-    tune.play(1, 0);
 
     tutorialModeButton = new TutorialButton(vec2(cameraPos.x - 10, cameraPos.y - 14));
     endlessModeButton = new EndlessMode(vec2(cameraPos.x + 10, cameraPos.y - 14));
@@ -100,19 +100,14 @@ function gameInit() {
 function gameUpdate() {
     if (currentScreen === Scene.Intro) {
         if (endlessModeButton.selected) {
-            currentScreen = Scene.Game;
-
             tutMode = false;
-
+            currentScreen = Scene.Game;
             makeTileLayers(levelSize);
-
             startGame();
         } else if (tutorialModeButton.selected) {
-
             tutMode = true;
-
+            currentScreen = Scene.Game;
             makeTileLayers(levelSize);
-
             startGame();
         }
 
@@ -133,12 +128,9 @@ function gameUpdate() {
                 enemies.push(new Peasant(vec2(rand(cameraPos.x - 15, cameraPos.x + 15), cameraPos.y + 42)))
             }
 
-
-
-            // font.drawText("Raise Dead:\nBring a resting\ncorpse back to life", vec2(cameraPos.x, cameraPos.y - 10), 0.2, true);
-            // font.drawText("Corpse Bomb:\nTurn a shambling minion\ninto a bomb", vec2(cameraPos.x, cameraPos.y - 16), 0.2, true);
-            // font.drawText("Drain Soul:\nAbsorb an enemies\nlife-force for mana", vec2(cameraPos.x, cameraPos.y - 22), 0.2, true);
-
+            if (tutMode && (enemyWave === 1 || enemyWave === 3 || enemyWave === 5)) {
+                paused = true;
+            }
 
         } else if (!spawnTimer.active()) {
             spawnTimer.set(2);
@@ -187,10 +179,6 @@ function gameRender() {
         drawTile(vec2(cameraPos.x, cameraPos.y + 2 + Math.sin(timeReal)), vec2(12), 1, tileSizeDefault, new Color(1,1,1), 0, 0, new Color(0,0,0,0), true);
         return;
     }
-        // font.drawText("Nether Bolt:\nThrow a flaming orb\n of dark energy", vec2(cameraPos.x, cameraPos.y - 4), 0.2, true);
-        // font.drawText("Raise Dead:\nBring a resting\ncorpse back to life", vec2(cameraPos.x, cameraPos.y - 10), 0.2, true);
-        // font.drawText("Corpse Bomb:\nTurn a shambling minion\ninto a bomb", vec2(cameraPos.x, cameraPos.y - 16), 0.2, true);
-        // font.drawText("Drain Soul:\nAbsorb an enemies\nlife-force for mana", vec2(cameraPos.x, cameraPos.y - 22), 0.2, true);
 
     drawRect( cameraPos,  levelSize, new Color(0, .1, .1), 0, false);
 
@@ -223,12 +211,36 @@ function gameRenderPost() {
     }
     const font = new FontImage();
 
-    // if (paused) {
-    //     switch (enemyWave) {
-    //         case 1:
-    //             font.drawText("Look at that pitiful worm!\nDestroy him with your Nether Blast!", cameraPos, 0.2, true)
-    //     }
-    // }
+    if (paused) {
+        switch (enemyWave) {
+            case 1:
+                drawRect(cameraPos, vec2(40, 35), new Color(0,0,0), 0, true)
+                drawTile(vec2(cameraPos.x, cameraPos.y + 8 + Math.sin(timeReal)), vec2(8), 1, tileSizeDefault, new Color(1,1,1), 0, 0, new Color(0,0,0,0), true);
+                font.drawText("Look at that that fool!\nI'll destroy him with\nmy Nether Bolt!\n\nClick to fire!", cameraPos, 0.2, true)
+                font.drawText("Continue", vec2(cameraPos.x, cameraPos.y - 12), 0.2, true)
+                netherBoltButton.doSelect();
+                break;
+            case 3:
+                drawRect(cameraPos, vec2(40, 35), new Color(0,0,0), 0, true)
+                drawTile(vec2(cameraPos.x, cameraPos.y + 8 + Math.sin(timeReal)), vec2(8), 1, tileSizeDefault, new Color(1,1,1), 0, 0, new Color(0,0,0,0), true);
+                font.drawText("I can use Drain Soul\nto replenish my mana by\ntargeting a peasant.\n\nClick to curse\none of them.", cameraPos, 0.2, true)
+                font.drawText("Continue", vec2(cameraPos.x, cameraPos.y - 12), 0.2, true)
+                drainSoulButton.doSelect();
+                break;
+            case 5:
+                drawRect(cameraPos, vec2(40, 40), new Color(0,0,0), 0, true)
+                drawTile(vec2(cameraPos.x, cameraPos.y + 10 + Math.sin(timeReal)), vec2(8), 1, tileSizeDefault, new Color(1,1,1), 0, 0, new Color(0,0,0,0), true);
+                font.drawText("Too many of them!\nI can Raise the Dead\nby clicking on their\ngrave stones.\n\nI can also blow them up\nusing corpse bomb\non them!", vec2(cameraPos.x, cameraPos.y + 2), 0.2, true)
+                font.drawText("Continue", vec2(cameraPos.x, cameraPos.y - 15), 0.2, true);
+                summonButton.doSelect();
+                break;
+        }
+
+        if (isDown()) {
+            paused = false
+        }
+
+    }
 
     if (necromancer.health === 0 && endTime <= 0) {
         drawRect(vec2(cameraPos.x, cameraPos.y + 10), vec2(40, 25), new Color(0, 0, 0), 0, true);
