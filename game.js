@@ -255,32 +255,14 @@ function isInside(circle_x, circle_y, rad, x, y) {
         (y - circle_y) * (y - circle_y) <= rad * rad)
 }
 
-function checkOverlap(r, bombPos, rectPos, rectSize) {
-    const circleDistanceX = abs(bombPos.x - rectPos.x);
-    const circleDistanceY = abs(bombPos.y - rectPos.y);
-
-    if (circleDistanceX > (rectSize.x/2 + r)) { return false; }
-    if (circleDistanceY > (rectSize.y/2 + r)) { return false; }
-
-    if (circleDistanceX <= (rectSize.x/2)) { return true; }
-    if (circleDistanceY <= (rectSize.y/2)) { return true; }
-
-    const cornerDistanceSQ = (circleDistanceX - rectPos.x/2)^2 +
-        (circleDistanceY - rectPos.y/2)^2;
-
-    return (cornerDistanceSQ <= (r^2));
-}
-
 function doExplosion(bomb) {
     [...enemies, ...summons].filter((e) => {
         if (isInside(bomb.pos.x, bomb.pos.y, 8, e.pos.x, e.pos.y)) {
-        //if (checkOverlap(8, bomb.pos, e.pos, e.size)) {
             e.health -= 75;
             const angle = e.pos.subtract(bomb.pos);
             e.applyForce(angle.normalize().scale(10));
         }
         if (isInside(bomb.pos.x, bomb.pos.y, 4, e.pos.x, e.pos.y)) {
-            //if (checkOverlap(8, bomb.pos, e.pos, e.size)) {
             e.health -= 100;
             const angle = e.pos.subtract(bomb.pos);
             e.applyForce(angle.normalize().scale(20));
@@ -331,8 +313,6 @@ function getParticleDrain(pos) {
     );
 }
 
-
-
 // Player
 class Necromancer extends EngineObject {
     constructor(pos) {
@@ -376,7 +356,6 @@ class Necromancer extends EngineObject {
     }
 }
 
-// Summons
 class Grave extends EngineObject {
     constructor(pos) {
         super(pos, vec2(3), 6);
@@ -387,6 +366,15 @@ class Grave extends EngineObject {
     refill() {
         this.full = true;
         this.tileIndex = 5;
+    }
+
+    update() {
+        super.update();
+        this.color = new Color(1,1,1);
+
+        if (summonButton.selected) {
+            this.color = new Color(0,1,0);
+        }
     }
 
     collideWithObject(o) {
