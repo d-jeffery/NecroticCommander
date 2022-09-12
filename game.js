@@ -32,7 +32,6 @@ const Scene = {
 let currentScreen = Scene.Intro;
 
 const tune = new Music([[[,0,400,,1.5,.3,1,0,,,,,4]],[[[,,20,,,20,,,19,,,19,,,12,,,15,,12,,,,12,,,20,,20,,,,19,,,19,,,12,,,,,,,,,,20,,,20,,,19,,,19,,,12,,,15,,,]],[[,,12,,,,,,15,,,17,,,14,,,15,,,12,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,]]],[0,1],,]);
-tune.play(1, 0);
 
 function startGame() {
     tutorialModeButton.destroy();
@@ -63,8 +62,6 @@ function startGame() {
             graves.push(new Grave(vec2(cameraPos.x + i, cameraPos.y + j + 8)))
         }
     }
-
-    tune.play(1, 0);
 }
 
 function makeTileLayers(size) {
@@ -96,6 +93,8 @@ function gameInit() {
 
     tutorialModeButton = new TutorialButton(vec2(cameraPos.x - 10, cameraPos.y - 14));
     endlessModeButton = new EndlessMode(vec2(cameraPos.x + 10, cameraPos.y - 14));
+
+    tune.play(1, 0);
 }
 
 /// ////////////////////////////////////////////////////////////////////////////
