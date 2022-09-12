@@ -315,6 +315,19 @@ function particleExplode(color1, color2, pos, size) {
     );
 }
 
+function getParticleDrain(pos) {
+    return new ParticleEmitter(
+        vec2(pos), 0, objectDefaultSize, 0, 4, 0,  // pos, angle, emitSize, emitTime, emitRate, emiteCone
+        0, tileSizeDefault,                              // tileIndex, tileSize
+        new Color(0, 1, 1), new Color(0, 0, 0),   // colorStartA, colorStartB
+        new Color(0, 1, 1, 0), new Color(0, 0, 0, 0), // colorEndA, colorEndB
+        2, 0.5, .2, .1, .05,  // particleTime, sizeStart, sizeEnd, particleSpeed, particleAngleSpeed
+        .99, 1, 1, PI, .05,  // damping, angleDamping, gravityScale, particleCone, fadeRate,
+        .5, 0                // randomness, collide, additive, randomColorLinear, renderOrder
+    );
+}
+
+
 
 // Player
 class Necromancer extends EngineObject {
@@ -533,10 +546,17 @@ class Enemy extends Unit {
             enemies.forEach((e) => {
                 e.beingDrained = false
                 e.color = new Color(1, 1, 1);
+                while (e.children.length > 0) {
+                    const child = e.children[0];
+                    e.removeChild(child);
+                    child.destroy();
+                }
             });
 
             this.beingDrained = true;
             this.color = new Color(0, 1, 1);
+
+            this.addChild(getParticleDrain(this.pos), vec2(), 0);
 
             return false;
         }
