@@ -22,6 +22,7 @@ let tutorialModeButton, endlessModeButton;
 let summons, enemies, graves;
 let hudHeight, endTime, screenShake;
 let enemyWave, spawnTimer;
+let tutMode;
 
 const Scene = {
     Intro: 0,
@@ -101,10 +102,14 @@ function gameUpdate() {
         if (endlessModeButton.selected) {
             currentScreen = Scene.Game;
 
+            tutMode = false;
+
             makeTileLayers(levelSize);
 
             startGame();
         } else if (tutorialModeButton.selected) {
+
+            tutMode = true;
 
             makeTileLayers(levelSize);
 
@@ -127,6 +132,14 @@ function gameUpdate() {
             for (let e = 0; e < enemyWave; e++) {
                 enemies.push(new Peasant(vec2(rand(cameraPos.x - 15, cameraPos.x + 15), cameraPos.y + 42)))
             }
+
+
+
+            // font.drawText("Raise Dead:\nBring a resting\ncorpse back to life", vec2(cameraPos.x, cameraPos.y - 10), 0.2, true);
+            // font.drawText("Corpse Bomb:\nTurn a shambling minion\ninto a bomb", vec2(cameraPos.x, cameraPos.y - 16), 0.2, true);
+            // font.drawText("Drain Soul:\nAbsorb an enemies\nlife-force for mana", vec2(cameraPos.x, cameraPos.y - 22), 0.2, true);
+
+
         } else if (!spawnTimer.active()) {
             spawnTimer.set(2);
         }
@@ -208,11 +221,18 @@ function gameRenderPost() {
     if (currentScreen !== Scene.Game) {
         return;
     }
-
     const font = new FontImage();
+
+    // if (paused) {
+    //     switch (enemyWave) {
+    //         case 1:
+    //             font.drawText("Look at that pitiful worm!\nDestroy him with your Nether Blast!", cameraPos, 0.2, true)
+    //     }
+    // }
+
     if (necromancer.health === 0 && endTime <= 0) {
-        drawRect(vec2(cameraPos.x, cameraPos.y + 10), vec2(40, 35), new Color(0, 0, 0), 0, true);
-        font.drawText(`YOUR REIGN\nHAS ENDED\n\nYou lasted\nto wave ${enemyWave}!\n\nClick to\nplay again`, vec2(cameraPos.x, cameraPos.y + 23), 0.4, true);
+        drawRect(vec2(cameraPos.x, cameraPos.y + 10), vec2(40, 25), new Color(0, 0, 0), 0, true);
+        font.drawText(`You survived\nto wave ${enemyWave}!\n\nClick to\nplay again`, vec2(cameraPos.x, cameraPos.y + 18), 0.4, true);
     }
 }
 
