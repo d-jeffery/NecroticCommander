@@ -161,7 +161,7 @@ function gameUpdatePost() {
         necromancer.health = 0;
         necromancer.destroy();
         cursor.destroy();
-        if (endTime <= 0 && (mouseIsDown(0) || gamepadIsDown(0))) {
+        if (endTime <= 0 && (mouseIsDown(0))) {
             tearDown();
             gameInit();
             startGame();
@@ -218,21 +218,21 @@ function gameRenderPost() {
                 drawRect(cameraPos, vec2(40, 35), new Color(0,0,0), 0, true)
                 drawTile(vec2(cameraPos.x, cameraPos.y + 8 + Math.sin(timeReal)), vec2(8), 1, tileSizeDefault, new Color(1,1,1), 0, 0, new Color(0,0,0,0), true);
                 font.drawText("Look at that that fool!\nI'll destroy him with\nmy Nether Bolt!\n\nClick to fire!", cameraPos, 0.2, true)
-                font.drawText("Continue", vec2(cameraPos.x, cameraPos.y - 12), 0.2, true)
+                font.drawText("Click to Continue", vec2(cameraPos.x, cameraPos.y - 12), 0.2, true)
                 netherBoltButton.doSelect();
                 break;
             case 3:
                 drawRect(cameraPos, vec2(40, 35), new Color(0,0,0), 0, true)
                 drawTile(vec2(cameraPos.x, cameraPos.y + 8 + Math.sin(timeReal)), vec2(8), 1, tileSizeDefault, new Color(1,1,1), 0, 0, new Color(0,0,0,0), true);
                 font.drawText("I can use Drain Soul\nto replenish my mana by\ntargeting a peasant.\n\nClick to curse\none of them.", cameraPos, 0.2, true)
-                font.drawText("Continue", vec2(cameraPos.x, cameraPos.y - 12), 0.2, true)
+                font.drawText("Click to Continue", vec2(cameraPos.x, cameraPos.y - 12), 0.2, true)
                 drainSoulButton.doSelect();
                 break;
             case 5:
                 drawRect(cameraPos, vec2(40, 40), new Color(0,0,0), 0, true)
                 drawTile(vec2(cameraPos.x, cameraPos.y + 10 + Math.sin(timeReal)), vec2(8), 1, tileSizeDefault, new Color(1,1,1), 0, 0, new Color(0,0,0,0), true);
-                font.drawText("Too many of them!\nI can Raise the Dead\nby clicking on their\ngrave stones.\n\nI can also blow them up\nusing corpse bomb\non them!", vec2(cameraPos.x, cameraPos.y + 2), 0.2, true)
-                font.drawText("Continue", vec2(cameraPos.x, cameraPos.y - 15), 0.2, true);
+                font.drawText("Too many of them!\nI can Raise the Dead\nby clicking on their\ngrave stones.\n\nI can also blow them up\nby using Corpse Bomb\non them!", vec2(cameraPos.x, cameraPos.y + 2), 0.2, true)
+                font.drawText("Click to Continue", vec2(cameraPos.x, cameraPos.y - 15), 0.2, true);
                 summonButton.doSelect();
                 break;
         }
@@ -287,11 +287,11 @@ const summonCost = 10;
 const explosionCost = 20;
 
 function isDown() {
-    return (mouseIsDown(0) || gamepadIsDown(0))
+    return mouseIsDown(0)
 }
 
 function isClicked(o) {
-    return (o === cursor && mouseIsDown(0)) || (o === cursor && gamepadIsDown(0))
+    return (o === cursor && mouseIsDown(0))
 }
 
 // Particles
@@ -617,15 +617,9 @@ class Cursor extends EngineObject {
     }
 
     update() {
-        if (isUsingGamepad) {
-            // control with gamepad
-            this.pos.x += gamepadStick(0).x;
-            this.pos.y += gamepadStick(0).y;
-        } else {
-            // move to mouse
-            this.pos.x = mousePos.x;
-            this.pos.y = mousePos.y;
-        }
+        this.pos.x = mousePos.x;
+        this.pos.y = mousePos.y;
+
         this.pos.x = clamp(this.pos.x, this.size.x / 2, levelSize.x - this.size.x / 2);
         this.pos.y = clamp(this.pos.y, this.size.y / 2, levelSize.y - this.size.y / 2)
     }
