@@ -5,8 +5,6 @@
     Easier touch controls
     Check on corpse bomb
     Fight sounds remove music
-    Soul Drain kills and slows
-    Refill graves
     highlight with raise dead and corpse bombs
     Refill graves after 10 waves
 */
@@ -245,7 +243,6 @@ function gameRenderPost() {
         if (isDown()) {
             paused = false
         }
-
     }
 
     if (necromancer.health === 0 && endTime <= 0) {
@@ -522,7 +519,7 @@ class Enemy extends Unit {
         super.update();
 
         if (this.beingDrained) {
-            this.health -= 15 * timeDelta;
+            this.health -= 12 * timeDelta;
 
             if (necromancer.mana < 100) {
                 necromancer.mana += 10 * timeDelta;
@@ -540,7 +537,6 @@ class Enemy extends Unit {
             return true;
         } else if (isClicked(o) &&
             drainSoulButton.selected) {
-
             enemies.forEach((e) => {
                 e.beingDrained = false
                 e.color = new Color(1, 1, 1);
@@ -548,11 +544,13 @@ class Enemy extends Unit {
                     const child = e.children[0];
                     e.removeChild(child);
                     child.destroy();
+                    e.maxVelocity = rand(0.08, 0.1);
                 }
             });
 
             this.beingDrained = true;
             this.color = new Color(0, 1, 1);
+            this.maxVelocity = 0.05;
 
             this.addChild(getParticleDrain(this.pos), vec2(), 0);
 
