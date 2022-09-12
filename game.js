@@ -211,28 +211,28 @@ function gameRenderPost() {
         return;
     }
     const font = new FontImage();
-
+    const continueText = "Click to Continue"
     if (paused) {
         switch (enemyWave) {
             case 1:
                 drawRect(cameraPos, vec2(40, 35), new Color(0,0,0), 0, true)
                 drawTile(vec2(cameraPos.x, cameraPos.y + 8 + Math.sin(timeReal)), vec2(8), 1, tileSizeDefault, new Color(1,1,1), 0, 0, new Color(0,0,0,0), true);
                 font.drawText("Look at that that fool!\nI'll destroy him with\nmy Nether Bolt!\n\nClick to fire!", cameraPos, 0.2, true)
-                font.drawText("Click to Continue", vec2(cameraPos.x, cameraPos.y - 12), 0.2, true)
+                font.drawText(continueText, vec2(cameraPos.x, cameraPos.y - 12), 0.2, true)
                 netherBoltButton.doSelect();
                 break;
             case 3:
                 drawRect(cameraPos, vec2(40, 35), new Color(0,0,0), 0, true)
                 drawTile(vec2(cameraPos.x, cameraPos.y + 8 + Math.sin(timeReal)), vec2(8), 1, tileSizeDefault, new Color(1,1,1), 0, 0, new Color(0,0,0,0), true);
                 font.drawText("I can use Drain Soul\nto replenish my mana by\ntargeting a peasant.\n\nClick to curse\none of them.", cameraPos, 0.2, true)
-                font.drawText("Click to Continue", vec2(cameraPos.x, cameraPos.y - 12), 0.2, true)
+                font.drawText(continueText, vec2(cameraPos.x, cameraPos.y - 12), 0.2, true)
                 drainSoulButton.doSelect();
                 break;
             case 5:
                 drawRect(cameraPos, vec2(40, 40), new Color(0,0,0), 0, true)
                 drawTile(vec2(cameraPos.x, cameraPos.y + 10 + Math.sin(timeReal)), vec2(8), 1, tileSizeDefault, new Color(1,1,1), 0, 0, new Color(0,0,0,0), true);
                 font.drawText("Too many of them!\nI can Raise the Dead\nby clicking on their\ngrave stones.\n\nI can also blow them up\nby using Corpse Bomb\non them!", vec2(cameraPos.x, cameraPos.y + 2), 0.2, true)
-                font.drawText("Click to Continue", vec2(cameraPos.x, cameraPos.y - 15), 0.2, true);
+                font.drawText(continueText, vec2(cameraPos.x, cameraPos.y - 15), 0.2, true);
                 summonButton.doSelect();
                 break;
         }
