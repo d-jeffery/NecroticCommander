@@ -3,8 +3,7 @@
 
     TODO:
     Easier touch controls
-    Check on corpse bomb
-    Fight sounds remove music
+    Fight sounds
     highlight with raise dead and corpse bombs
     Refill graves after 10 waves
 */
@@ -251,6 +250,11 @@ function gameRenderPost() {
     }
 }
 
+function isInside(circle_x, circle_y, rad, x, y) {
+    return ((x - circle_x) * (x - circle_x) +
+        (y - circle_y) * (y - circle_y) <= rad * rad)
+}
+
 function checkOverlap(r, bombPos, rectPos, rectSize) {
     const circleDistanceX = abs(bombPos.x - rectPos.x);
     const circleDistanceY = abs(bombPos.y - rectPos.y);
@@ -269,12 +273,17 @@ function checkOverlap(r, bombPos, rectPos, rectSize) {
 
 function doExplosion(bomb) {
     [...enemies, ...summons].filter((e) => {
-        if (checkOverlap(8, bomb.pos, e.pos, e.size)) {
+        if (isInside(bomb.pos.x, bomb.pos.y, 8, e.pos.x, e.pos.y)) {
+        //if (checkOverlap(8, bomb.pos, e.pos, e.size)) {
+            e.health -= 75;
+            const angle = e.pos.subtract(bomb.pos);
+            e.applyForce(angle.normalize().scale(10));
+        }
+        if (isInside(bomb.pos.x, bomb.pos.y, 4, e.pos.x, e.pos.y)) {
+            //if (checkOverlap(8, bomb.pos, e.pos, e.size)) {
             e.health -= 100;
-
             const angle = e.pos.subtract(bomb.pos);
             e.applyForce(angle.normalize().scale(20));
-
         }
     });
     particleExplode(new Color(1, 0, 0), new Color(0, 0, 0), bomb.pos, bomb.size.scale(2));
@@ -471,6 +480,12 @@ class Summon extends Unit {
 
     update() {
         super.update();
+        this.color = new Color(1,1,1);
+
+        if (explosionButton.selected) {
+            this.color = new Color(0,1,0)
+        }
+
         if (enemies.length) {
             let closest = undefined;
             enemies.forEach((e) => {
@@ -501,8 +516,8 @@ class Summon extends Unit {
             explosionButton.selected &&
             necromancer.mana - explosionCost > 0) {
             necromancer.mana -= explosionCost;
-            this.destroy();
             doExplosion(this);
+            this.destroy();
             return false;
         }
         return false;
