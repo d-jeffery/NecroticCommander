@@ -159,8 +159,15 @@ function gameUpdatePost() {
     if (necromancer.health <= 0) {
         endTime -= timeDelta;
         necromancer.health = 0;
+
+        if (!necromancer.destroyed) {
+            particleExplode(new Color(1, 0, 0), new Color(0, 0, 0), necromancer.pos, necromancer.size);
+            particleExplode(new Color(.4, .4, .4), new Color(0, 0, 0), necromancer.pos, necromancer.size);
+        }
+
         necromancer.destroy();
         cursor.destroy();
+
         if (endTime <= 0 && (mouseIsDown(0))) {
             tearDown();
             gameInit();
@@ -325,13 +332,6 @@ class Necromancer extends EngineObject {
     }
 
     update() {
-        if (this.health <= 0) {
-            particleExplode(new Color(1, 0, 0), new Color(0, 0, 0), this.pos, this.size);
-            particleExplode(new Color(.4, .4, .4), new Color(0, 0, 0), this.pos, this.size);
-
-            return;
-        }
-
         this.boltThrowTime += timeDelta;
         if (netherBoltButton.selected &&
             isClicked(cursor) &&
