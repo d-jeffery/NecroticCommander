@@ -4,8 +4,8 @@
     TODO:
     Easier touch controls
     Fight sounds
-    highlight with raise dead and corpse bombs
     Refill graves after 10 waves
+    WAve count
 */
 
 'use strict';
@@ -182,6 +182,8 @@ function gameRender() {
         drawTile(vec2(cameraPos.x, cameraPos.y + 2 + Math.sin(timeReal)), vec2(12), 1, tileSizeDefault, new Color(1,1,1), 0, 0, new Color(0,0,0,0), true);
         return;
     }
+
+    font.drawText(`Peasant wave ${enemyWave}`, vec2(2, 78), 0.18, false);
 
     drawRect( cameraPos,  levelSize, new Color(0, .1, .1), 0, false);
 
