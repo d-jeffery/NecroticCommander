@@ -134,7 +134,7 @@ function gameUpdate() {
                 enemies.push(new Peasant(vec2(rand(cameraPos.x - 15, cameraPos.x + 15), cameraPos.y + 42)))
             }
 
-            if (enemyWave === 10) {
+            if (!noHopeMode && !(enemyWave % 10)) {
                 graves.forEach(g => {
                     if (!g.full) g.refill()
                 });
