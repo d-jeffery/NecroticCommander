@@ -17,11 +17,11 @@ showWatermark = 0;
 
 let levelSize, tileLayer, cursor, necromancer;
 let summonButton, explosionButton, netherBoltButton, drainSoulButton;
-let tutorialModeButton, endlessModeButton;
+let tutorialModeButton, endlessModeButton, certainDeathMode;
 let summons, enemies, graves;
 let hudHeight, endTime, screenShake;
 let enemyWave, spawnTimer;
-let tutMode;
+let tutMode, noHopeMode;
 
 const Scene = {
     Intro: 0,
@@ -33,6 +33,7 @@ let currentScreen = Scene.Intro;
 function startGame() {
     tutorialModeButton.destroy();
     endlessModeButton.destroy();
+    certainDeathMode.destroy();
 
     necromancer = new Necromancer(vec2(levelSize.x / 2, 22));
     cursor = new Cursor(vec2(levelSize.x / 2, levelSize.y / 2));
@@ -88,20 +89,29 @@ function gameInit() {
     cameraScale = 16;
     cursor = new Cursor(vec2(levelSize.x / 2, levelSize.y / 2));
 
-    tutorialModeButton = new TutorialButton(vec2(cameraPos.x - 12, cameraPos.y - 14));
-    endlessModeButton = new EndlessMode(vec2(cameraPos.x + 12, cameraPos.y - 14));
+    tutorialModeButton = new TutorialButton(vec2(cameraPos.x, cameraPos.y + 3));
+    endlessModeButton = new EndlessMode(vec2(cameraPos.x, cameraPos.y - 12));
+    certainDeathMode = new CertainDeathMode(vec2(cameraPos.x, cameraPos.y - 27))
 }
 
 /// ////////////////////////////////////////////////////////////////////////////
 function gameUpdate() {
     if (currentScreen === Scene.Intro) {
-        if (endlessModeButton.selected) {
-            tutMode = false;
+        if (tutorialModeButton.selected) {
+            noHopeMode = false;
+            tutMode = true;
             currentScreen = Scene.Game;
             makeTileLayers(levelSize);
             startGame();
-        } else if (tutorialModeButton.selected) {
-            tutMode = true;
+        } else if (endlessModeButton.selected) {
+            tutMode = false;
+            noHopeMode = false;
+            currentScreen = Scene.Game;
+            makeTileLayers(levelSize);
+            startGame();
+        }  else if (certainDeathMode.selected) {
+            noHopeMode = true;
+            tutMode = false;
             currentScreen = Scene.Game;
             makeTileLayers(levelSize);
             startGame();
@@ -124,7 +134,13 @@ function gameUpdate() {
                 enemies.push(new Peasant(vec2(rand(cameraPos.x - 15, cameraPos.x + 15), cameraPos.y + 42)))
             }
 
-            if (tutMode && (enemyWave === 1 || enemyWave === 3 || enemyWave === 5)) {
+            if (enemyWave === 10) {
+                graves.forEach(g => {
+                    if (!g.full) g.refill()
+                });
+            }
+
+            if (tutMode && (enemyWave === 1 || enemyWave === 3 || enemyWave === 5 || enemyWave === 10)) {
                 paused = true;
             }
 
@@ -178,10 +194,12 @@ function gameRender() {
 
     if (currentScreen === Scene.Intro) {
         drawRect( cameraPos, levelSize, new Color(0, 0, 0), 0, false);
-        font.drawText("Necrotic\nCommander", vec2(cameraPos.x, cameraPos.y + 24), 0.6, true);
-        drawTile(vec2(cameraPos.x, cameraPos.y + 2 + Math.sin(timeReal)), vec2(12), 1, tileSizeDefault, new Color(1,1,1), 0, 0, new Color(0,0,0,0), true);
-        font.drawText("Learn to Play\nStart Here", vec2(cameraPos.x - 12, cameraPos.y - 19), 0.18, true);
-        font.drawText("No Help,\nLimited Graves ", vec2(cameraPos.x + 12, cameraPos.y - 19), 0.18, true);
+        font.drawText("Necrotic\nCommander", vec2(cameraPos.x, cameraPos.y + 36), 0.6, true);
+        drawTile(vec2(cameraPos.x, cameraPos.y + 16 + Math.sin(timeReal)), vec2(12), 1, tileSizeDefault, new Color(1,1,1), 0, 0, new Color(0,0,0,0), true);
+        font.drawText("Learn how to play.", vec2(cameraPos.x, cameraPos.y - 2), 0.18, true);
+        font.drawText("No Instructions.\n", vec2(cameraPos.x, cameraPos.y - 17), 0.18, true);
+        font.drawText("No Hope.", vec2(cameraPos.x, cameraPos.y - 32), 0.18, true);
+
         return;
     }
 
@@ -240,6 +258,12 @@ function gameRenderPost() {
                 font.drawText("Too many of them!\nI can Raise the Dead\nby clicking on their\ngrave stones.\n\nI can also blow them up\nby using Corpse Bomb\non them!", vec2(cameraPos.x, cameraPos.y + 2), 0.2, true)
                 font.drawText(continueText, vec2(cameraPos.x, cameraPos.y - 15), 0.2, true);
                 summonButton.doSelect();
+                break;
+            case 10:
+                drawRect(cameraPos, vec2(40, 35), new Color(0,0,0), 0, true)
+                drawTile(vec2(cameraPos.x, cameraPos.y + 8 + Math.sin(timeReal)), vec2(8), 1, tileSizeDefault, new Color(1,1,1), 0, 0, new Color(0,0,0,0), true);
+                font.drawText("We have enough\nbodies to bury,\nbolstering our numbers.\n\nMuhahaha!", cameraPos, 0.2, true)
+                font.drawText(continueText, vec2(cameraPos.x, cameraPos.y - 12), 0.2, true)
                 break;
         }
 
@@ -369,7 +393,10 @@ class Grave extends EngineObject {
 
     refill() {
         this.full = true;
-        this.tileIndex = 5;
+        this.tileIndex = 6;
+        const color1 = new Color(0.70, 0.44, 0.44);
+        const color2 = color1.lerp(new Color, .5);
+        particleExplode(color1, color2, this.pos, this.size);
     }
 
     update() {
@@ -739,6 +766,12 @@ class TutorialButton extends Button {
 class EndlessMode extends Button {
     constructor(pos) {
         super(pos, vec2(18, 8), "Endless\nMode", -1, new Color(1,0,0), new Color(0.5, 0, 0));
+    }
+}
+
+class CertainDeathMode extends Button {
+    constructor(pos) {
+        super(pos, vec2(18, 8), "Certain\nDeath Mode", -1, new Color(1,0,0), new Color(0.5, 0, 0));
     }
 }
 
