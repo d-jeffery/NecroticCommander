@@ -23,6 +23,15 @@ let hudHeight, endTime, screenShake;
 let enemyWave, spawnTimer;
 let tutMode, noHopeMode;
 
+const crush = new Sound([,0,400,,,,4,,,,,,,,,.2]);
+const digCrush = new Sound([,0,400,,.05,,4,,,,,,,,,.2]);
+const digSound = new Sound([,0,400,,,,,,,,,,,1]);
+const castBolt = new Sound([,0,400,,.05,,2,,.2,,,,,,,.2]);
+const crumble = new Sound([,0,400,,.3,,4,,,,,,,1,.5,.3]);
+const explode = new Sound([,0,400,,.3,,4,,,,,,,1,.5]);
+const curse = new Sound([,0,400,,,,2,,,,20,.1,,,1,.2]);
+const death = new Sound([,0,400,,,,4,,,,20,.1,,,1,.2]);
+
 const Scene = {
     Intro: 0,
     Game: 1
@@ -174,6 +183,7 @@ function gameUpdatePost() {
         if (!necromancer.destroyed) {
             particleExplode(new Color(1, 0, 0), new Color(0, 0, 0), necromancer.pos, necromancer.size);
             particleExplode(new Color(.4, .4, .4), new Color(0, 0, 0), necromancer.pos, necromancer.size);
+            crumble.play(necromancer.pos);
         }
 
         necromancer.destroy();
@@ -253,10 +263,10 @@ function gameRenderPost() {
                 drainSoulButton.doSelect();
                 break;
             case 5:
-                drawRect(cameraPos, vec2(40, 40), new Color(0,0,0), 0, true)
+                drawRect(cameraPos, vec2(40, 35), new Color(0,0,0), 0, true)
                 drawTile(vec2(cameraPos.x, cameraPos.y + 10 + Math.sin(timeReal)), vec2(8), 1, tileSizeDefault, new Color(1,1,1), 0, 0, new Color(0,0,0,0), true);
-                font.drawText("Too many of them!\nI can Raise the Dead\nby clicking on their\ngrave stones.\n\nI can also blow them up\nby using Corpse Bomb\non them!", vec2(cameraPos.x, cameraPos.y + 2), 0.2, true)
-                font.drawText(continueText, vec2(cameraPos.x, cameraPos.y - 15), 0.2, true);
+                font.drawText("I can Raise the Dead\nby clicking on their\ngrave stones.\n\nUse Corpse Bomb on\nthem to blow them up!", vec2(cameraPos.x, cameraPos.y + 2), 0.2, true)
+                font.drawText(continueText, vec2(cameraPos.x, cameraPos.y - 12), 0.2, true);
                 summonButton.doSelect();
                 break;
             case 10:
@@ -298,7 +308,7 @@ function doExplosion(bomb) {
     });
     particleExplode(new Color(1, 0, 0), new Color(0, 0, 0), bomb.pos, bomb.size.scale(2));
     particleExplode(new Color(0, 1, 0), new Color(0, 0, 0), bomb.pos, bomb.size.scale(2));
-
+    explode.play(bomb.pos);
     screenShake = 0.1;
 }
 
@@ -363,7 +373,7 @@ class Necromancer extends EngineObject {
             cursor.pos.y > hudHeight &&
             this.mana >= netherBoltCost &&
             this.boltThrowTime > 0.5) {
-
+            castBolt.play(this.pos);
             const angle = cursor.pos.subtract(this.pos);
             const bolt = new Bolt(this.pos, angle.angle());
             bolt.applyForce(angle.normalize());
@@ -397,12 +407,12 @@ class Grave extends EngineObject {
         const color1 = new Color(0.70, 0.44, 0.44);
         const color2 = color1.lerp(new Color, .5);
         particleExplode(color1, color2, this.pos, this.size);
+        digSound.play(this.pos);
     }
 
     update() {
         super.update();
         this.color = new Color(1,1,1);
-
         if (summonButton.selected && tutMode) {
             const flashColor = abs(Math.cos(timeReal));
             this.color = new Color(flashColor, flashColor, flashColor);
@@ -425,6 +435,7 @@ class Grave extends EngineObject {
                 const color1 = new Color(0.70, 0.44, 0.44);
                 const color2 = color1.lerp(new Color, .5);
                 particleExplode(color1, color2, this.pos, this.size);
+                digCrush.play(o.pos)
             }
         }
         return false;
@@ -451,6 +462,7 @@ class Unit extends EngineObject {
         if (this.health <= 0) {
             particleExplode(new Color(1, 0, 0), new Color(0, 0, 0), this.pos, this.size);
             this.destroy();
+            death.play(this.pos);
         }
     }
 
@@ -596,7 +608,7 @@ class Enemy extends Unit {
             this.maxVelocity = 0.05;
 
             this.addChild(getParticleDrain(this.pos), vec2(), 0);
-
+            curse.play(this.pos);
             return false;
         }
 
@@ -655,6 +667,7 @@ class Bolt extends EngineObject {
 
     collideWithObject(o) {
         if (o instanceof Unit) {
+            crush.play(o.pos);
             this.destroy();
             o.target = undefined;
             o.health -= 50;
