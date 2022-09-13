@@ -88,8 +88,8 @@ function gameInit() {
     cameraScale = 16;
     cursor = new Cursor(vec2(levelSize.x / 2, levelSize.y / 2));
 
-    tutorialModeButton = new TutorialButton(vec2(cameraPos.x - 10, cameraPos.y - 14));
-    endlessModeButton = new EndlessMode(vec2(cameraPos.x + 10, cameraPos.y - 14));
+    tutorialModeButton = new TutorialButton(vec2(cameraPos.x - 12, cameraPos.y - 14));
+    endlessModeButton = new EndlessMode(vec2(cameraPos.x + 12, cameraPos.y - 14));
 }
 
 /// ////////////////////////////////////////////////////////////////////////////
@@ -180,6 +180,8 @@ function gameRender() {
         drawRect( cameraPos, levelSize, new Color(0, 0, 0), 0, false);
         font.drawText("Necrotic\nCommander", vec2(cameraPos.x, cameraPos.y + 24), 0.6, true);
         drawTile(vec2(cameraPos.x, cameraPos.y + 2 + Math.sin(timeReal)), vec2(12), 1, tileSizeDefault, new Color(1,1,1), 0, 0, new Color(0,0,0,0), true);
+        font.drawText("Learn to Play\nStart Here", vec2(cameraPos.x - 12, cameraPos.y - 19), 0.18, true);
+        font.drawText("No Help,\nLimited Graves ", vec2(cameraPos.x + 12, cameraPos.y - 19), 0.18, true);
         return;
     }
 
@@ -730,13 +732,13 @@ class CorpseBombButton extends Button {
 
 class TutorialButton extends Button {
     constructor(pos) {
-        super(pos, vec2(15, 8), "Tutorial\nMode", -1, new Color(1, 0, 0), new Color(0.5, 0, 0));
+        super(pos, vec2(18, 8), "Guided\nMode", -1, new Color(1, 0, 0), new Color(0.5, 0, 0));
     }
 }
 
 class EndlessMode extends Button {
     constructor(pos) {
-        super(pos, vec2(15, 8), "Endless\nMode", -1, new Color(1,0,0), new Color(0.5, 0, 0));
+        super(pos, vec2(18, 8), "Endless\nMode", -1, new Color(1,0,0), new Color(0.5, 0, 0));
     }
 }
 
