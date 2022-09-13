@@ -372,8 +372,9 @@ class Grave extends EngineObject {
         super.update();
         this.color = new Color(1,1,1);
 
-        if (summonButton.selected) {
-            this.color = new Color(0,1,0);
+        if (summonButton.selected && tutMode) {
+            const flashColor = abs(Math.cos(timeReal));
+            this.color = new Color(flashColor, flashColor, flashColor);
         }
     }
 
@@ -470,8 +471,9 @@ class Summon extends Unit {
         super.update();
         this.color = new Color(1,1,1);
 
-        if (explosionButton.selected) {
-            this.color = new Color(0,1,0)
+        if (explosionButton.selected && tutMode) {
+            const flashColor = abs(Math.cos(timeReal));
+            this.color = new Color(flashColor, flashColor, flashColor);
         }
 
         if (enemies.length) {
@@ -521,13 +523,21 @@ class Enemy extends Unit {
     update() {
         super.update();
 
+        this.color = new Color(1, 1, 1)
+
         if (this.beingDrained) {
             this.health -= 12 * timeDelta;
+            this.color = new Color(0, 1, 1);
 
             if (necromancer.mana < 100) {
                 necromancer.mana += 10 * timeDelta;
             }
             return false;
+        } else {
+            if ((drainSoulButton.selected || netherBoltButton.selected ) && tutMode) {
+                const flashColor = abs(Math.cos(timeReal));
+                this.color = new Color(flashColor, flashColor, flashColor);
+            }
         }
     }
 
@@ -552,7 +562,6 @@ class Enemy extends Unit {
             });
 
             this.beingDrained = true;
-            this.color = new Color(0, 1, 1);
             this.maxVelocity = 0.05;
 
             this.addChild(getParticleDrain(this.pos), vec2(), 0);
